@@ -1,0 +1,122 @@
+/*
+IMPORTANT:
+In order to preserve the uniform grid appearance, all cell styles need to have padding, margin and border sizes.
+No built-in (selected, editable, highlight, flashing, invalid, loading, :focus) or user-specified CSS
+classes should alter those!
+*/
+
+.slick-row.selected {
+  z-index: 10;
+  background: #DFE8F6;
+}
+
+.slick-group-toggle {
+  width: 9px;
+  height: 9px;
+  margin-right: 10px !important;
+  margin-left: 10px !important;
+}
+
+.slick-group{
+    background: #e6e6e6 url(http://circuit2/dme/demetrics/css/jquery/smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x !important;   
+}
+
+.slick-group-toggle.expanded {
+  background: url(http://circuit2/dme/demetrics/css/images/collapse.gif) no-repeat center center;
+}
+
+.slick-group-toggle.collapsed {
+  background: url(http://circuit2/dme/demetrics/css/images/expand.gif) no-repeat center center;
+}
+
+.slick-group .slick-cell
+{
+    text-align:left !important;
+}
+
+.slick-group-totals {
+  color: gray;
+  background: white;
+}
+
+.slick-cell.selected {
+  background: rgb(206, 230, 240);
+  color: #000;
+  -webkit-transition: background 0.15s ease-in-out;
+}
+
+.slick-sortable-placeholder {
+  background: silver !important;
+}
+
+.slick-row.odd {
+  /*background: #fafafa;*/
+}
+
+.slick-row.ui-state-active {
+  background: #F5F7D7;
+}
+
+.slick-cell.invalid {
+  border-color: red;
+  -moz-animation-duration: 0.2s;
+  -webkit-animation-duration: 0.2s;
+  -moz-animation-name: slickgrid-invalid-hilite;
+  -webkit-animation-name: slickgrid-invalid-hilite;  
+}
+
+@-moz-keyframes slickgrid-invalid-hilite {
+  from { box-shadow: 0 0 6px red; }
+  to { box-shadow: none; }
+}
+
+@-webkit-keyframes slickgrid-invalid-hilite {
+  from { box-shadow: 0 0 6px red; }
+  to { box-shadow: none; }
+}
+
+.slick-cell.copied {
+    background: rgb(168, 221, 245);
+}
+
+.slick-headerrow-column input {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.slick-pager
+{
+    width: auto !important;    
+}
+
+.slick-pager .slick-pager-status 
+{
+    font-size: 11px !important;
+    padding: 3px !important;
+}
+
+.slick-pager .slick-pager-settings * {
+    font-size: 11px !important;
+}
+
+#pager
+{
+    margin-bottom: 20px;    
+}
+
+.slick-cell img {
+    vertical-align: initial;
+}
+
+.editor-text {
+    margin: 0;
+    padding: 0 !important;
+    width: 100%;
+    height: 100% !important;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
