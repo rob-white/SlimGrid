@@ -938,7 +938,6 @@ function SlimGrid() {
             // Set columns into SlickGrid
             gridview.setColumns(standardColumns);
             gridview.onHeaderRowCellRendered.unsubscribe(events.onHeaderRowCellRendered);
-            gridview.onHeaderRowCellRendered.subscribe(events.onHeaderRowCellRendered);
 
             // Set the new data into our dataview
             dataview.beginUpdate();

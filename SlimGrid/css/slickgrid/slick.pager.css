@@ -2,7 +2,6 @@
   width: 100%;
   height: 26px;
   border: 1px solid #B6B6B6;
-  border-top: 0;
   background: url('images/header-columns-bg.gif') repeat-x center bottom;
   vertical-align: middle;
 }

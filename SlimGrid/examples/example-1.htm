@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
-    <title>SlimGrid Example 1</title>
+    <title>SlimGrid - Example 1</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -39,7 +39,29 @@
     <div class="tab-content">
         <div class="tab-pane" id="example-1">
             <div class="row-fluid">
-                <div id="example-1-table" class="span12"></div>
+                <div id="example-1-table" class="span7"></div>
+                <div class="span5">
+                    <h3 class="text-center">Overview</h3>
+                    <hr/>
+                    <ul>
+                        <li>Filter columns with either input field or header filter plugin drop-down</li>
+                        <li>
+                            Ability to filter input fields using equality symbols (examples below)
+                            <ul>
+                                <li>= 0 (equal to 0)</li>
+                                <li>> 20 (greater than 20)</li>
+                                <li><> 50 (Not equal to 50)</li>
+                                <li>etc.</li>
+                            </ul>
+                        </li>
+                        <li>Copy out into Excel by selecting cells and using Ctrl+C</li>
+                        <li>Download CSV file of entire set of data for Excel by clicking <i>Download Data</i>
+                            <ul>
+                                <li><b>Modern Browsers Only</b></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <!--/#example-1 -->
@@ -96,8 +118,7 @@
                 grid = SlimGrid();	// Create a base SlimGrid
 
         // Constructor
-        function page() {
-        }
+        function page() { }
 
         // ----- Public functions -----
         page.init = function () {
@@ -109,9 +130,9 @@
                     .height(gridHeight)				// The height of the grid
                     .primaryKey('id')				// Unique key for the data (required by SlickGrid)
                     .autoIncrement(false)			// If we don't have a unique key, SlimGrid can auto-generate one
-                    .copyOut(false)					// Don't allow user to copy out data with ctrl-c
+                    .copyOut(true)					// Allow user to copy out data with ctrl-c
                     .downloadable(true)				// Download data (csv) link provided at bottom of grid
-                    .showColumnpicker(false)		// Column filter plugin added to right-click of column headers
+                    .showColumnpicker(false)		// Don't use column filter plugin on right-click of column headers
                     .showHeaderFilter(true)			// Filter plugin added to column headers
                     .selectionModel("cell")			// Cells are selectable (default 'rows')
                     .slickgridOptions({
@@ -120,7 +141,7 @@
                         forceFitColumns: false,
                         multiSelect: true
                     })
-                    .render(data); 				// Add data to grid and render
+                    .render(data);                  // Add data to grid and render
 
             // When this tab is shown to the user,
             // run resize for page elements
@@ -143,6 +164,7 @@
             for (var i = 0; i < 1000; i++) {
                 data.push({'id': i, 'column1': i * 2, 'column2': i * 3, 'column3': i * 4});
             }
+
             return data;
         }
 
