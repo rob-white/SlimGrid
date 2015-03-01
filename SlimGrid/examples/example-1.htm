@@ -20,8 +20,8 @@
     <link href="../css/slickgrid/plugins-common.css?v=1.0" rel="stylesheet" type="text/css"/>
 
     <style type="text/css">
-        /* Push tabs down so they aren't flush with the top*/
-        .tab-content {
+        /* Push tabs down so they aren't flush with the top */
+        #tab-container {
             margin-top: 80px;
         }
     </style>
@@ -83,13 +83,14 @@
     // Example 1
     $(document).ready(function () {
         // When jQuery's ready, initialize the example and show the tab
-        var example = Example1.init().show();
+        var example = Example1().init().show();
     });
 
     function Example1() {
-
+        // Reference elements with jQuery
         var $el = {
-                    gridContainer: $('#example-1-table') // Reference the div we want for the SlimGrid w/ jQuery
+                    tab: $('#example-1-tab a'),
+                    gridContainer: $('#example-1-table')
                 },
                 gridHeight = 600,	// Set the height we want to use
                 grid = SlimGrid();	// Create a base SlimGrid
@@ -101,21 +102,21 @@
         // ----- Public functions -----
         page.init = function () {
 
-            var data = generateDummyData();		// Create example data
+            var data = generateDummyData();		    // Create example data
 
             // Create a SlimGrid (SlickGrid) with options and formatting
-            grid.container($el.gridContainer)	// The container element of the grid (a jQuery element)
+            grid.container($el.gridContainer)	    // The container element of the grid (a jQuery element)
                     .height(gridHeight)				// The height of the grid
                     .primaryKey('id')				// Unique key for the data (required by SlickGrid)
-                    .autoIncrement(false)			// If we don't have a unique key, SlimGrid will auto-generate one
-                    .copyOut(true)					// Allow user to copy out data with ctrl-c
+                    .autoIncrement(false)			// If we don't have a unique key, SlimGrid can auto-generate one
+                    .copyOut(false)					// Don't allow user to copy out data with ctrl-c
                     .downloadable(true)				// Download data (csv) link provided at bottom of grid
                     .showColumnpicker(false)		// Column filter plugin added to right-click of column headers
                     .showHeaderFilter(true)			// Filter plugin added to column headers
                     .selectionModel("cell")			// Cells are selectable (default 'rows')
                     .slickgridOptions({
                         // Any of SlickGrid's options can be applied here
-                        defaultColumnWidth: 100,
+                        defaultColumnWidth: 120,
                         forceFitColumns: false,
                         multiSelect: true
                     })

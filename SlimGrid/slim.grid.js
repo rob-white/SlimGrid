@@ -76,7 +76,7 @@ function SlimGrid() {
             onHeaderRowCellRendered: function (e, args) {
                 if (args.column.id != '_checkbox_selector') {
                     $(args.node).empty();
-                    $("<input data-toggle='popover' data-trigger='hover' title='" + args.column.id + "' class='text-center' type='text'>")
+                    $("<input title='" + args.column.id + "' class='text-center' type='text'>")
                         .data("columnId", args.column.id)
                         .val(columnFilters[args.column.id])
                         .appendTo(args.node);
@@ -787,7 +787,6 @@ function SlimGrid() {
                     $(gridview.getHeaderRow()).delegate(":input", "change keyup", function (e) {
                         var columnId = $(this).data("columnId");
                         if (columnId != null) {
-                            $(this).popover('hide'); // Hide popover once user starts typing
                             columnFilters[columnId] = $.trim($(this).val());
                             delay(function () {
                                 dataview.refresh();
@@ -878,16 +877,6 @@ function SlimGrid() {
                     showLoadingIndicator(false);
                     if (loadingIndicator) pager.append(loadingIndicator);
 
-                    var selector = (typeof (container.attr('id')) !== 'undefined' || container.attr('id') !== null) ? '#' + container.attr('id') : '.' + container.attr('class');
-                    myGrid.find('input[data-toggle="popover"]').each(function () {
-                        $(this).popover({
-                            container: selector,
-                            html: true,
-                            content: 'Type >=, <=, >, <, =, or <> with a space and value for detailed filtering </br> <b>Example: > 50</b>',
-                            placement: 'top'
-                        });
-                    });
-
                     exists = true; // At this point, if everything worked, the grid should be rendered
                 });
             }
@@ -950,16 +939,6 @@ function SlimGrid() {
             gridview.setColumns(standardColumns);
             gridview.onHeaderRowCellRendered.unsubscribe(events.onHeaderRowCellRendered);
             gridview.onHeaderRowCellRendered.subscribe(events.onHeaderRowCellRendered);
-
-            var selector = (typeof (container.attr('id')) !== 'undefined' || container.attr('id') !== null) ? '#' + container.attr('id') : '.' + container.attr('class');
-            myGrid.find('input[data-toggle="popover"]').each(function () {
-                $(this).popover({
-                    container: selector,
-                    html: true,
-                    content: 'Type >=, <=, >, <, =, or <> with a space and value for detailed filtering </br> <b>Example: > 50</b>',
-                    placement: 'top'
-                });
-            });
 
             // Set the new data into our dataview
             dataview.beginUpdate();
