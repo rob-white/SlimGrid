@@ -1,7 +1,11 @@
-﻿// Author: 	Rob White
-// SlimGrid
+﻿// SlimGrid
+// Author: 	Rob White
 // A wrapper for SlickGrid to slim down the amount of time 
 // and code required to create a simple SlickGrid
+//
+// SlickGrid
+// Author: Michael Leibman
+// https://github.com/mleibman/SlickGrid
 
 function SlimGrid() {
 
@@ -19,14 +23,6 @@ function SlimGrid() {
         enableTextSelectionOnCells: false,
         forceFitColumns: false,
         multiSelect: false
-    },
-    rowFormatter = function (row, dataview) {
-   	},
-    columnFormatter = function (row, cell, value, columnDef, dataContext) {
-    	return value;
-    },
-    columnOptions = function (key, column) {
-        return column;
     },
     exists = false,
     autoIncrement = false,
@@ -50,6 +46,15 @@ function SlimGrid() {
         url: '',
         cache: false,
         dataType: 'json'
+    },
+	rowFormatter = function (row, dataview) {
+		
+   	},
+    columnFormatter = function (row, cell, value, columnDef, dataContext) {
+    	return value;
+    },
+    columnOptions = function (key, column) {
+        return column;
     },
     events = {
         onContextMenu: function (e, cell, gridview) { },
@@ -86,15 +91,18 @@ function SlimGrid() {
 
 	// Constructor
     function grid() { }
-
+	
+	// Render the SlickGrid
+	// If data isn't provided directly, we assume ajax request
+	// Otherwise, we can't render the grid without data
     grid.render = function (data) {
     	
         if (ajaxOptions.url && !arguments.length) {
-            refreshData(function (json) {             
-                var d = events.beforeRender(json);
-                if (d) json = d;
+            refreshData(function (data) {             
+                var d = events.beforeRender(data);
+                if (d) data = d;
                 
-                initGrid(json);
+                initGrid(data);
             }, function (error) {
                 events.onRenderError(error);
                 throw new Error('There was an ajax error when retrieving remote data.');
@@ -118,134 +126,101 @@ function SlimGrid() {
         return grid;
     };
 
+	// If the SlickGrid object already exists
+	// Resize the canvas to fit the page
     grid.resize = function () {
         if (exists) {
             gridview.resizeCanvas();
             gridview.invalidate();
         }
+        
         return grid;
     };
-
+	
+	// Getter/Setter for beforeRender event
     grid.beforeRender = function (_) {
         if (!arguments.length) return events.beforeRender;
         events.beforeRender = _;
+        
         return grid;
     };
 
+	// Getter/Setter for afterRender event
     grid.afterRender = function (_) {
         if (!arguments.length) return events.afterRender;
         events.afterRender = _;
+        
         return grid;
     };
 
+	// Getter/Setter for onRenderError event
     grid.onRenderError = function (_) {
         if (!arguments.length) return events.onRenderError;
         events.onRenderError = _;
+        
         return grid;
     };
 
     grid.gridview = function (_) {
         if (!arguments.length) return gridview;
         gridview = _;
+        
         return grid;
     };
 
     grid.dataview = function (_) {
         if (!arguments.length) return dataview;
         dataview = _;
+        
         return grid;
-    };
-
-    grid.getData = function (_) {
-        return dataview.getItems();
-    };
-
-    grid.addRow = function (_) {
-        dataview.insertItem(0, _);
-        dataview.refresh();
-    };
-
-    grid.addRows = function (arr) {
-        dataview.beginUpdate();
-        arr.forEach(function (item) {
-            dataview.insertItem(0, item);
-        });
-        dataview.endUpdate();
-        dataview.refresh();
-    };
-
-    grid.updateRow = function (p, _) {
-        dataview.updateItem(p, _);
-        dataview.refresh();
-    };
-
-    grid.updateRows = function (p, d) {
-        if (d.length > 0) {
-            dataview.beginUpdate();
-            d.forEach(function (item) {
-                dataview.updateItem(item[p], item);
-            });
-            dataview.endUpdate();
-            dataview.refresh();
-        }
-    };
-
-    grid.rowIdExists = function (p) {
-        return rowExists(p);
-    };
-
-    grid.getFilteredData = function () {
-        var numRows = dataview.getLength(), data = [], i = 0;
-        while (i < numRows) {
-            data.push($.extend(true, {}, dataview.getItem(i))); // Creates a deep copy of the object (so we don't hold reference to the old)
-            i++;
-        }
-        return data;
-    };
-
-    grid.getSelectedRows = function () {
-        return getSelectedRows();
     };
 
     grid.showColumnpicker = function (_) {
         if (!arguments.length) return showColumnpicker;
         showColumnpicker = _;
+        
         return grid;
     };
 
     grid.showHeaderFilter = function (_) {
         if (!arguments.length) return showHeaderFilter;
         showHeaderFilter = _;
+        
         return grid;
     };
 
     grid.primaryKey = function (_) {
         if (!arguments.length) return pk;
         pk = _;
+        
         return grid;
     };
 
     grid.autoIncrement = function (_) {
         if (!arguments.length) return autoIncrement;
         autoIncrement = _;
+        
         return grid;
     };
 
     grid.ajaxOptions = function (_) {
         if (!arguments.length) return $.extend(true, {}, ajaxOptions);
         ajaxOptions = $.extend(ajaxOptions, _);
+        
         return grid;
     };
 
     grid.downloadable = function (_) {
         if (!arguments.length) return downloadable;
         downloadable = _;
+        
         return grid;
     };
 
     grid.pasteExactOnly = function (_) {
         if (!arguments.length) return pasteExactOnly;
         pasteExactOnly = _;
+        
         return grid;
     };
 
@@ -256,121 +231,215 @@ function SlimGrid() {
             gridview.setOptions(_);
             gridview.invalidate();
         }
+        
         return grid;
     };
 
     grid.loadingIndicator = function (_) {
         if (!arguments.length) return loadingIndicator;
         loadingIndicator = _;
+        
         return grid;
     };
 
     grid.rowFormatter = function (_) {
         if (!arguments.length) return rowFormatter;
         rowFormatter = _;
+        
         return grid;
     };
 
     grid.columnFormatter = function (_) {
         if (!arguments.length) return columnFormatter;
         columnFormatter = _;
+        
         return grid;
     };
 
     grid.columnOptions = function (_) {
         if (!arguments.length) return columnOptions;
         columnOptions = _;
+        
         return grid;
     };
 
     grid.columns = function (_) {
         if (!arguments.length && gridview) return gridview.getColumns();
         if (gridview) gridview.setColumns(_);
+        
         return grid;
     };
 
     grid.container = function (_) {
         if (!arguments.length) return container;
         container = _;
+        
         return grid;
     };
 
     grid.height = function (_) {
         if (!arguments.length) return height;
         height = _;
+        
         return grid;
-    };
-
-    grid.exists = function () {
-        return exists;
     };
 
     grid.contextMenu = function (_) {
         if (!arguments.length) return contextMenu;
         contextMenu = _;
+        
         return grid;
     };
 
     grid.copyOut = function (_) {
         if (!arguments.length) return copyOut;
         copyOut = _;
+        
         return grid;
     };
 
     grid.selectionModel = function (_) {
         if (!arguments.length) return selectionModel;
         selectionModel = _;
+        
         return grid;
     };
 
     grid.onAddNewRow = function (_) {
         if (!arguments.length) return events.onAddNewRow;
         events.onAddNewRow = _;
+        
         return grid;
     };
 
     grid.onContextMenu = function (_) {
         if (!arguments.length) return events.onContextMenu;
         events.onContextMenu = _;
+        
         return grid;
     };
 
     grid.onContextMenuClick = function (_) {
         if (!arguments.length) return events.onContextMenuClick;
         events.onContextMenuClick = _;
+        
         return grid;
     };
 
     grid.onRowSelected = function (_) {
         if (!arguments.length) return events.onRowSelected;
         events.onRowSelected = _;
+        
         return grid;
     };
 
     grid.onDataviewUpdate = function (_) {
         if (!arguments.length) return events.onDataviewUpdate;
         events.onDataviewUpdate = _;
+        
         return grid;
     };
 
     grid.onCellChange = function (_) {
         if (!arguments.length) return events.onCellChange;
         events.onCellChange = _;
+        
         return grid;
     };
 
     grid.onPasteCells = function (_) {
         if (!arguments.length) return events.onPasteCells;
         events.onPasteCells = _;
+        
         return grid;
     };
 
     grid.onPasteCellsUndo = function (_) {
         if (!arguments.length) return events.onPasteCellsUndo;
         events.onPasteCellsUndo = _;
+        
         return grid;
     };
+    
+    // Returns true/false whether or not the
+    // SlickGrid has been created (rendered) or not
+    grid.exists = function () {
+        return exists;
+    };
+    
+	// SlimGrid always uses a SlickGrid w/ dataview
+	// So grab and return the data from the dataview
+    grid.getData = function (_) {
+        return dataview.getItems();
+    };
 
+	// Add a row to the top of the grid
+	// Refresh the dataview/grid to show the change
+    grid.addRow = function (_) {
+        dataview.insertItem(0, _);
+        dataview.refresh();
+    };
+
+	// Add multiple rows to the top of the grid
+    grid.addRows = function (arr) {
+        dataview.beginUpdate();
+        arr.forEach(function (item) {
+            dataview.insertItem(0, item);
+        });
+        dataview.endUpdate();
+        dataview.refresh();
+    };
+
+	// Update a row given the primary key value
+	// and the updated row object
+    grid.updateRow = function (p, _) {
+        dataview.updateItem(p, _);
+        dataview.refresh();
+    };
+
+	// Update multiple rows at once using the key
+	// of the primary key value and the updated item
+    grid.updateRows = function (key, d) {
+        if (d.length > 0) {
+            dataview.beginUpdate();
+            d.forEach(function (item) {
+                dataview.updateItem(item[key], item);
+            });
+            dataview.endUpdate();
+            dataview.refresh();
+        }
+    };
+	
+	// Returns true/false whether or not a row exists given
+	// the primary key value
+    grid.rowIdExists = function (p) {
+        return rowExists(p);
+    };
+
+	// If the grid is filtered, returns the data from that filtered set
+	// Creates a deep copy of each object (so we don't hold reference to data still in grid)
+    grid.getFilteredData = function () {
+        var numRows = dataview.getLength(), data = [], i = 0;
+        while (i < numRows) {
+            data.push($.extend(true, {}, dataview.getItem(i)));
+            i++;
+        }
+        
+        return data;
+    };
+	
+	// Returns a dataset of the currently selected rows in
+	// the grid
+    grid.getSelectedRows = function () {
+        return getSelectedRows();
+    };
+
+
+	// ----- Private functions -----
+	// Returns true/false whether or not a row exists
+	// given a primary key value
+	//
+	// Underscore.js function currently used for finding row...
     function rowExists(p) {
         var d = dataview.getItems();
         var found = _.find(d, function (item) {
@@ -379,7 +448,23 @@ function SlimGrid() {
         
         return !found ? false : true;
     }
+    
+    // Returns an array of the currently selected rows
+    // in the grid
+    function getSelectedRows() {
+        var selectedData = [];
+        if (exists) {
+            var selectedIndexes = gridview.getSelectedRows();
+            $.each(selectedIndexes, function (index, value) {
+                selectedData.push(gridview.getData().getItem(value));
+            });
+        }
+        
+        return selectedData;
+    }
 
+	// Performs a jQuery ajax request with the provided
+	// ajax options. Callbacks are called based on ajax result
     function refreshData(success, err) {
     	
 		showLoadingIndicator(true);
@@ -393,91 +478,33 @@ function SlimGrid() {
             dataType: ajaxOptions.dataType,
             success:
                 function (data) {
-                    success(data); 	// Passed custom callback, pass data
+                    success(data);
                 },
             error:
                 function (error) {
                 	showLoadingIndicator(false);
-                    err(error); 	// Passed custom callback, pass error code
+                    err(error);
                 }
         });
     }
 
-    function updateGrid(data) {
-    	
-        // Make sure we have a slickgrid object that exists
-        if (exists) {
-            var standardColumns = [];
-            for (key in data[0]) {
-                if (key != pk) {
-                    // Default column options
-                    var column = { 'id': key, 'name': key, 'field': key, 'sortable': true, 'formatter': columnFormatter, 'cssClass': 'text-center' };
-                    
-                    // Override/merge column options with custom preferences
-                    column = columnOptions(key, column);
-                    column['formatter'] = columnFormatter;
+    function initGrid(data) {
+        if (data.length > 0) {
 
-                    var addColumn = true;
-                    
-                    // Hide the column so it doesn't display in the grid
-                    // NOTE: The column is still available when accessing grid data
-                    if (column.hasOwnProperty('hidden')) {
-                        if (column['hidden']) addColumn = false;
-                    }
-                    if (addColumn) standardColumns.push(column);
-                }
-            }
-
-            gridview.setColumns(standardColumns);
-            gridview.onHeaderRowCellRendered.unsubscribe(events.onHeaderRowCellRendered);
-            gridview.onHeaderRowCellRendered.subscribe(events.onHeaderRowCellRendered);
-
-            var selector = (typeof (container.attr('id')) !== 'undefined' || container.attr('id') !== null) ? '#' + container.attr('id') : '.' + container.attr('class');
-            myGrid.find('input[data-toggle="popover"]').each(function () {
-                $(this).popover({
-                    container: selector,
-                    html: true,
-                    content: 'Type >=, <=, >, <, =, or <> with a space and value for detailed filtering </br> <b>Example: > 50</b>',
-                    placement: 'top'
-                });
-            });
-
-            dataview.beginUpdate();
-            dataview.setItems(data);
-            dataview.endUpdate();
-
-            dataview.getItemMetadata = function (row) {
-                return rowFormatter(row, dataview);
-            };
-
-            gridview.invalidate();
-            gridview.resizeCanvas();
-
-			showLoadingIndicator(false);
-        }
-        else {
-        	showLoadingIndicator(false);
-            if (events.onRenderError) events.onRenderError();
-            throw new Error('Tried to call methods on Slickgrid object that does not exist.');
-        }
-    }
-
-    function initGrid(json) {
-        if (json.length > 0) {
-
-            // If we want a temporary key, because Dave didn't give one to us
+            // If we want a temporary key
             if (autoIncrement) {
                 var rowid = 0;
-                for (row in json) {
-                    json[row][pk] = rowid;
+                for (row in data) {
+                    data[row][pk] = rowid;
                     ++rowid;
                 }
             }
-
-            if (!gridview) {
+				
+			// If the SlickGrid doesn't arleady exist
+            if (!exists) {
                 var standardColumns = [];
 
-                for (key in json[0]) {
+                for (key in data[0]) {
                     if (key != pk) {
                         // Default column options
                         var column = { 'id': key, 'name': key, 'field': key, 'sortable': true, 'formatter': columnFormatter, 'cssClass': 'text-center' };
@@ -496,7 +523,8 @@ function SlimGrid() {
                 var pluginOptions = {
                     clipboardCommandHandler: function (editCommand) {
                         if (slickgridOptions.editable) {
-                            undoRedoBuffer.queueAndExecuteCommand.call(undoRedoBuffer, editCommand);    // Paste/Under/Redo occured, call corresponding command
+                        	 // Paste/Under/Redo occured, call corresponding command
+                            undoRedoBuffer.queueAndExecuteCommand.call(undoRedoBuffer, editCommand);
                         }
                     },
                     exactDataOnly: pasteExactOnly,
@@ -537,11 +565,10 @@ function SlimGrid() {
 
                 function filter(item) {
                     // Regex pattern to validate numbers
-                    var patRegex_no = /^[$]?[-+]?[0-9.,]*[$%]?$/; // a number negative/positive with decimals with/without $, %
-
-                    var columns = gridview.getColumns();
-
-                    var value = true;
+                    // a number negative/positive with decimals with/without $, %
+                    var patRegex_no = /^[$]?[-+]?[0-9.,]*[$%]?$/,
+	                    columns = gridview.getColumns(),
+	                    value = true;
 
                     for (var i = 0; i < columns.length; i++) {
                         var col = columns[i];
@@ -623,8 +650,8 @@ function SlimGrid() {
 
                 $(function () {
 
-                    var data = json;
-                    myGrid.css('height', height + 'px');
+                    myGrid.css('height', height + 'px'); // Set the height of the grid container
+                    
                     var groupItemMetadataProvider = new Slick.Data.GroupItemMetadataProvider();
                     dataview = new Slick.Data.DataView({
                         groupItemMetadataProvider: groupItemMetadataProvider
@@ -692,8 +719,9 @@ function SlimGrid() {
 
                     if (selectionModel == 'row') {
                         gridview.onSelectedRowsChanged.subscribe(function (e) {
-                            var selectedIndexes = gridview.getSelectedRows();
-                            var selectedData = getSelectedRows();
+                            var selectedIndexes = gridview.getSelectedRows(),
+                            	selectedData = getSelectedRows();
+                            
                             events.onRowSelected(e, selectedData);
                             if (selectedIndexes.length > 0) gridview.setActiveCell(selectedIndexes[0], 0);
                         });
@@ -705,9 +733,10 @@ function SlimGrid() {
                         cols.forEach(function (col) {
                             row[col['id']] = item.hasOwnProperty(col['id']) ? item[col['id']] : null;
                         });
+                        
                         events.onAddNewRow(e, args, [row]);
                     });
-
+					
                     dataview.onRowCountChanged.subscribe(function (e, args) {
                         if (exists) events.onDataviewUpdate(e, args, gridview);
                         gridview.updateRowCount();
@@ -730,7 +759,8 @@ function SlimGrid() {
                             timer = setTimeout(callback, ms);
                         };
                     })();
-
+					
+					// Update the dataview after a delay when filter is typed in header
                     $(gridview.getHeaderRow()).delegate(":input", "change keyup", function (e) {
                         var columnId = $(this).data("columnId");
                         if (columnId != null) {
@@ -746,6 +776,7 @@ function SlimGrid() {
 
                     gridview.onCellChange.subscribe(function (e, args) {
                         var cell = {};
+                        
                         cell.pkColumn = pk;
                         cell.pk = args.item[pk];
                         cell.value = args.item[gridview.getColumns()[args.cell].field];
@@ -784,13 +815,15 @@ function SlimGrid() {
 
                     myGrid.appendTo(container);
                     myPager.appendTo(container);
+                    
                     var pager = new Slick.Controls.Pager(dataview, gridview, myPager);
 
                     dataview.beginUpdate();
                     dataview.setItems(data, pk);
                     dataview.setFilter(filter);
                     dataview.endUpdate();
-
+					
+					//	https://github.com/danny-sg/slickgrid-spreadsheet-plugins
                     if (showHeaderFilter) {
                         var filterPlugin = new Ext.Plugins.HeaderFilter({});
 
@@ -808,16 +841,14 @@ function SlimGrid() {
 
                         gridview.registerPlugin(filterPlugin);
                     }
-
+					
                     gridview.init();
 
+                    // If we want the grid to be excel downloadable
                     var pager = $(myPager).find('.slick-pager');
-                    pager.css('margin-bottom', '70px');
-
-                    // If user wants grid downloadable
                     if (downloadable) {
+                        // Creates an Excel download link if the browser isn't old IE
                         pager.append('<span id="' + downloadId + '" style="padding: 3px !important; font-size: 11px;"></span>');
-                        // Creates an Excel download button if the browser isn't IE
                         createDownloadCSVButton('#' + downloadId + '', 'RawData', false, '', 'Download Data', data);
                     }
 
@@ -833,16 +864,19 @@ function SlimGrid() {
                             placement: 'top'
                         });
                     });
-                    exists = true;
+                    
+                    exists = true; // At this point, if everything worked, the grid should be rendered
                 });
             }
             else {
-                // If user wants grid downloadable
+            	// If we want the grid to be excel downloadable
+                // Creates an Excel download button if the browser isn't IE
                 if (downloadable) {
-                    createDownloadCSVButton('#' + downloadId + '', 'RawData', false, '', 'Download Data', json);   // Creates an Excel download button if the browser isn't IE
+                    createDownloadCSVButton('#' + downloadId + '', 'RawData', false, '', 'Download Data', data);
                 }
+                
                 // Update the existing grid with new data
-                updateGrid(json);
+                updateGrid(data);
             }
         }
         else {
@@ -850,33 +884,90 @@ function SlimGrid() {
             throw new Error('Dataset empty when trying to initialize grid.');
         }
 
-        // Call the "after" callback when function complete (if provided)
-        events.afterRender(json, gridview);
+        events.afterRender(data, gridview);
     }
 
+    function updateGrid(data) {
+    	
+        // Make sure we have a SlickGrid already
+        if (exists) {
+        	
+            var standardColumns = [];
+            
+            for (key in data[0]) {
+            	// By default, don't show the primary key column
+                if (key != pk) {
+                	
+                    // Default column options
+                    var column = { 'id': key, 'name': key, 'field': key, 'sortable': true, 'formatter': columnFormatter, 'cssClass': 'text-center' };
+                    
+                    // Override/merge column options with custom preferences
+                    // Column formatter can probably be merged with columnOptions in a future update
+                    column = columnOptions(key, column);
+                    column['formatter'] = columnFormatter;
+                    
+                    // Hide the column so it doesn't display in the grid
+                    // NOTE: The column is still available when accessing grid data
+					var addColumn = true;
+                    if (column.hasOwnProperty('hidden')) {
+                        if (column['hidden']) addColumn = false;
+                    }
+                    if (addColumn) standardColumns.push(column);
+                }
+            }
+			
+			// Set columns into SlickGrid
+            gridview.setColumns(standardColumns);
+            gridview.onHeaderRowCellRendered.unsubscribe(events.onHeaderRowCellRendered);
+            gridview.onHeaderRowCellRendered.subscribe(events.onHeaderRowCellRendered);
+
+            var selector = (typeof (container.attr('id')) !== 'undefined' || container.attr('id') !== null) ? '#' + container.attr('id') : '.' + container.attr('class');
+            myGrid.find('input[data-toggle="popover"]').each(function () {
+                $(this).popover({
+                    container: selector,
+                    html: true,
+                    content: 'Type >=, <=, >, <, =, or <> with a space and value for detailed filtering </br> <b>Example: > 50</b>',
+                    placement: 'top'
+                });
+            });
+			
+			// Set the new data into our dataview
+            dataview.beginUpdate();
+            dataview.setItems(data);
+            dataview.endUpdate();
+			
+			// Allow formatting of rows (color, etc.) using SlickGrid metadata access
+            dataview.getItemMetadata = function (row) {
+                return rowFormatter(row, dataview);
+            };
+			
+			// Resize grid just in case
+            gridview.invalidate();
+            gridview.resizeCanvas();
+            
+			showLoadingIndicator(false);
+        }
+        else {
+        	showLoadingIndicator(false);
+            if (events.onRenderError) events.onRenderError();
+            throw new Error('Tried to call methods on Slickgrid object that does not exist.');
+        }
+    }
+	
+	// Helper function to show/hide loading indicator spinner (if it exists)
 	function showLoadingIndicator(show){
 		if(loadingIndicator){
 			if(show) loadingIndicator.show();
 			else loadingIndicator.hide();
 		}
 	}
-
+	
+	// Helper function for generating a unique identifier or download id/SlimGrid id
     function generateUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
-    }
-
-    function getSelectedRows() {
-        var selectedData = [];
-        if (exists) {
-            var selectedIndexes = gridview.getSelectedRows();
-            $.each(selectedIndexes, function (index, value) {
-                selectedData.push(gridview.getData().getItem(value));
-            });
-        }
-        return selectedData;
     }
 
     // Create a download CSV button (remove current data if there's already one)
@@ -918,7 +1009,6 @@ function SlimGrid() {
         }
 
         // Converts from JSON format to CSV format (header included)
-        //
         // Recieves:
         // - objArray (array): Flat json object array, each object is considered a row.
         // Returns: 

@@ -8,8 +8,8 @@
     });
 
     /*
-    Based on SlickGrid Header Menu Plugin (https://github.com/mleibman/SlickGrid/blob/master/plugins/slick.headermenu.js)
-    (Can't be used at the same time as the header menu plugin as it implements the dropdown in the same way)
+	    Based on SlickGrid Header Menu Plugin (https://github.com/mleibman/SlickGrid/blob/master/plugins/slick.headermenu.js)
+	    (Can't be used at the same time as the header menu plugin as it implements the dropdown in the same way)
     */
 
     function HeaderFilter(options) {
@@ -19,10 +19,10 @@
             self = this,
             handler = new Slick.EventHandler(),
             defaults = {
-                buttonImage: "http://circuit2/dme/demetrics/css/slickgrid/images/down.png",
-                filterImage: "http://circuit2/dme/demetrics/css/slickgrid/images/filter.png",
-                sortAscImage: "http://circuit2/dme/demetrics/css/slickgrid/images/sort-asc.png",
-                sortDescImage: "http://circuit2/dme/demetrics/css/slickgrid/images/sort-desc.png"
+                buttonImage: "../css/slickgrid/images/down.png",
+                filterImage: "../css/slickgrid/images/filter.png",
+                sortAscImage: "../css/slickgrid/images/sort-asc.png",
+                sortDescImage: "../css/slickgrid/images/sort-desc.png"
             };
 
         function init(g) {
