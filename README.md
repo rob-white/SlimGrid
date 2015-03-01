@@ -1,8 +1,8 @@
 # SlimGrid
 
-A wrapper for SlickGrid to slim down the amount of timecode to create a simple grid
+A wrapper for SlickGrid to slim down the amount of time and code required to create a SlickGrid
 
-## Very Simple Example
+## A Simple Example
 
 ```javascript
 var container = $('body');
