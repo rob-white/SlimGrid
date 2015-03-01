@@ -1,6 +1,6 @@
 ﻿// SlimGrid
 // Author: 	Rob White
-// A wrapper for SlickGrid to slim down the amount of time 
+// A wrapper for SlickGrid to slim down the amount of time
 // and code required to create a simple SlickGrid
 //
 // SlickGrid
@@ -9,7 +9,7 @@
 
 function SlimGrid() {
 
-	// Some default slickgrid options
+	// Some default SlickGrid options
     var slickgridOptions = {
         showHeaderRow: true,
         enableCellNavigation: true,
