@@ -1,6 +1,6 @@
 # SlimGrid
 
-A wrapper for SlickGrid to slim down the amount of time and code required to create a SlickGrid
+A wrapper for [SlickGrid](https://github.com/mleibman/SlickGrid) to slim down the amount of time and code required to create a SlickGrid
 
 ## A Simple Example
 
@@ -18,6 +18,5 @@ var grid = SlimGrid()
 
 ## To-Do
 
-- Documentation
-- Code up more examples
+- Wiki (Documentation, examples)
 - Remove dependency to underscore.js
