@@ -1,221 +1,219 @@
 ﻿<!DOCTYPE html>
 <head>
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
-	<title>SlimGrid Example 3</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <title>SlimGrid Example 3</title>
 
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<!-- Bootstrap themed site -->
-	<link href="../css/bootstrap/bootstrap.min.css?v=1.0" rel="stylesheet" type="text/css" />
-	<link href="../css/bootstrap/bootstrap-responsive.min.css?v=1.0" rel="stylesheet" type="text/css" />
+    <!-- Bootstrap themed site -->
+    <link href="../css/bootstrap/bootstrap.min.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/bootstrap/bootstrap-responsive.min.css?v=1.0" rel="stylesheet" type="text/css"/>
 
-	<!-- CSS required for Slickgrid -->
-	<link href="../css/slickgrid/slick.grid.css?v=1.0" rel="stylesheet" type="text/css" />
-	<link href="../css/jquery/smoothness/jquery-ui-1.10.3.custom.min.css?v=1.0" rel="stylesheet" type="text/css" />
-	<link href="../css/slickgrid/slick.pager.css?v=1.0" rel="stylesheet" type="text/css" />
-	<link href="../css/slickgrid/slick.columnpicker.css?v=1.0" rel="stylesheet" type="text/css" />
-	<link href="../css/slickgrid/slick.headerbuttons.css?v=1.0" rel="stylesheet" type="text/css" />
-	<link href="../css/slickgrid/slick.headermenu.css?v=1.0" rel="stylesheet"  type="text/css" />
-	<link href="../css/slickgrid/slick-default-theme.css?v=1.0" rel="stylesheet" type="text/css" />
-	<link href="../css/slickgrid/plugins-common.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <!-- CSS required for Slickgrid -->
+    <link href="../css/slickgrid/slick.grid.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/jquery/smoothness/jquery-ui-1.10.3.custom.min.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.pager.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.columnpicker.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.headerbuttons.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.headermenu.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick-default-theme.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/plugins-common.css?v=1.0" rel="stylesheet" type="text/css"/>
 
-	<style type="text/css">
-		.special-cell {
-			height: 100%;
-			display: block;
-			padding: 0px;
-			font-weight: bold;
-			vertical-align: baseline;
-			white-space: nowrap;
-			padding-left: 2px;
-			padding-right: 2px;
-		}
+    <style type="text/css">
+        .special-cell {
+            height: 100%;
+            display: block;
+            padding: 0px;
+            font-weight: bold;
+            vertical-align: baseline;
+            white-space: nowrap;
+            padding-left: 2px;
+            padding-right: 2px;
+        }
 
-		.tab-content {
-			margin-top: 80px;
-		}
+        .tab-content {
+            margin-top: 80px;
+        }
 
-		.query-settings {
-			margin-bottom: 10px;
-		}
-	</style>
+        .query-settings {
+            margin-bottom: 10px;
+        }
+    </style>
 </head><!--/head -->
 
 <html lang="en-us">
-	<body>
-		<div id="tab-container" class="container-fluid">
-			<ul class="nav nav-tabs" id="tabs">
-				<li id="example-3-tab">
-					<a href="#example-3" data-toggle="tab">Example 3</a>
-				</li>
-			</ul><!--/#tabs -->
-			<div class="tab-content">
-				<div class="tab-pane" id="example-3">
-					<form class="query-settings form-inline">
-						<button id="example-3-query-btn" type="submit" class="btn btn-primary">
-							Pull Data
-						</button>
-					</form>
-					<div class="row-fluid">
-						<div id="example-3-table" class="span12"></div>
-					</div>
-				</div><!--/#example-3 -->
-			</div><!--/.tab-content -->
-		</div><!--/.tab-content -->
+<body>
+<div id="tab-container" class="container-fluid">
+    <ul class="nav nav-tabs" id="tabs">
+        <li id="example-3-tab">
+            <a href="#example-3" data-toggle="tab">Example 3</a>
+        </li>
+    </ul>
+    <!--/#tabs -->
+    <div class="tab-content">
+        <div class="tab-pane" id="example-3">
+            <form class="query-settings form-inline">
+                <button id="example-3-query-btn" type="submit" class="btn btn-primary">
+                    Pull Data
+                </button>
+            </form>
+            <div class="row-fluid">
+                <div id="example-3-table" class="span12"></div>
+            </div>
+        </div>
+        <!--/#example-3 -->
+    </div>
+    <!--/.tab-content -->
+</div>
+<!--/.tab-content -->
 
-		<!-- jQuery scripts -->
-		<script src="../js/jquery/jquery-1.9.1.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/jquery/jquery-ui-1.10.3.custom.min.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/jquery/jquery.event.drop-2.2.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/jquery/jquery.event.drag-2.2.js?v=1.0" type="text/javascript"></script>
+<!-- jQuery scripts -->
+<script src="../js/jquery/jquery-1.9.1.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery-ui-1.10.3.custom.min.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery.event.drop-2.2.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery.event.drag-2.2.js?v=1.0" type="text/javascript"></script>
 
-		<!-- Bootstrap scripts -->
-		<script src="../js/bootstrap/bootstrap.min.js?v=1.0" type="text/javascript"></script>
+<!-- Bootstrap scripts -->
+<script src="../js/bootstrap/bootstrap.min.js?v=1.0" type="text/javascript"></script>
 
-		<!-- Slickgrid scripts -->
-		<script src="../js/slickgrid/slick.core.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.grid.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.formatters.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.dataview.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.pager.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.groupitemmetadataprovider.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.cellrangedecorator.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.cellrangeselector.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.cellselectionmodel.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.rowselectionmodel.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.columnpicker.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slickgrid.headerfilter.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.cellexternalcopymanager.js?v=1.0" type="text/javascript"></script>
-		<script src="../js/slickgrid/slick.editors.js?v=1.0" type="text/javascript"></script>
+<!-- Slickgrid scripts -->
+<script src="../js/slickgrid/slick.core.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.grid.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.formatters.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.dataview.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.pager.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.groupitemmetadataprovider.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellrangedecorator.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellrangeselector.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellselectionmodel.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.rowselectionmodel.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.columnpicker.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slickgrid.headerfilter.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellexternalcopymanager.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.editors.js?v=1.0" type="text/javascript"></script>
 
-		<!-- SlimGrid dependency (will be removed in future update)-->
-		<script src="../js/underscore/underscore.js?v=1.0" type="text/javascript"></script>
+<!-- SlimGrid dependency (will be removed in future update)-->
+<script src="../js/underscore/underscore.js?v=1.0" type="text/javascript"></script>
 
-		<!-- SlimGrid wrapper for SlickGrid creation -->
-		<script src="../slim.grid.js?v=1.0" type="text/javascript"></script>
+<!-- SlimGrid wrapper for SlickGrid creation -->
+<script src="../slim.grid.js?v=1.0" type="text/javascript"></script>
 
-		<script type="text/javascript">
-			// Example 3
-			$(document).ready(function() {
-				// When jQuery's ready, initialize the example and show the tab
-				var example = Example3.init().show();
-			});
+<script type="text/javascript">
+    // Example 3
+    $(document).ready(function () {
+        // When jQuery's ready, initialize the example and show the tab
+        var example = Example3.init().show();
+    });
 
-			function Example3() {
+    function Example3() {
 
-				var $el = {
-					tab : $('#example-3-tab a'),
-					queryBtn : $('#example-3-query-btn'),
-					gridContainer : $('#example-3-table')
-				},
-				gridHeight = 600,
-				grid = SlimGrid();
+        var $el = {
+                    tab: $('#example-3-tab a'),
+                    queryBtn: $('#example-3-query-btn'),
+                    gridContainer: $('#example-3-table')
+                },
+                gridHeight = 600,
+                grid = SlimGrid();
 
-				// Constructor
-				function page() { }
+        // Constructor
+        function page() {
+        }
 
-				// ----- Public -----
-				page.init = function() {
+        // ----- Public -----
+        page.init = function () {
 
-					// Create a SlimGrid (SlickGrid) with options and formatting
-					grid.container($el.gridContainer)
-						.height(gridHeight)
-						.copyOut(true)
-						.autoIncrement(true)
-						.downloadable(true)
-						.showColumnpicker(false)
-						.showHeaderFilter(true)
-						.selectionModel("cell")
-						.columnFormatter(function(row, cell, value, columnDef, dataContext) {
-							if (value == 'VALUE') {
-								return "<span class=\"special-cell\" style='background-color: rgb(214, 39, 40); color: #FFF'>" + value + "</span>";
-							}
-							return value;
-						}).columnOptions(function(key, column) {
-							if (key == 'COLUMN_NAME'){
-								column['width'] = 500;
-							}
-							if (key == 'COLUMN_NAME_2'){
-								column['hidden'] = true;
-							}
-							return column;
-						}).slickgridOptions({
-							// Any of SlickGrid's options can be applied here
-							defaultColumnWidth : 90,
-							forceFitColumns : false,
-							multiSelect : true
-						}).beforeRender(function(data) {
-							// Called after data is pulled, but before
-							// the grid is actually rendered on screen
-							if (data.length == 0){
-								alert("Oh no! There's no data for the grid!");
-							}
-							return data;
-						}).afterRender(function() {
-							// Called after the grid is rendered on screen
-							disablePageLoading();
-						});
+            // Create a SlimGrid (SlickGrid) with options and formatting
+            grid.container($el.gridContainer)
+                    .height(gridHeight)
+                    .copyOut(true)
+                    .autoIncrement(true)
+                    .downloadable(true)
+                    .showColumnpicker(false)
+                    .showHeaderFilter(true)
+                    .selectionModel("cell")
+                    .columnFormatter(function (row, cell, value, columnDef, dataContext) {
+                        if (value == 'VALUE') {
+                            return "<span class=\"special-cell\" style='background-color: rgb(214, 39, 40); color: #FFF'>" + value + "</span>";
+                        }
+                        return value;
+                    }).columnOptions(function (key, column) {
+                        if (key == 'COLUMN_NAME') {
+                            column['width'] = 500;
+                        }
+                        if (key == 'COLUMN_NAME_2') {
+                            column['hidden'] = true;
+                        }
+                        return column;
+                    }).slickgridOptions({
+                        // Any of SlickGrid's options can be applied here
+                        defaultColumnWidth: 90,
+                        forceFitColumns: false,
+                        multiSelect: true
+                    }).beforeRender(function (data) {
+                        // Called after data is pulled, but before
+                        // the grid is actually rendered on screen
+                        if (data.length == 0) {
+                            alert("Oh no! There's no data for the grid!");
+                        }
+                        return data;
+                    }).afterRender(function () {
+                        // Called after the grid is rendered on screen
+                        disablePageLoading();
+                    });
 
-					// Allow buttons to respond to on-click event
-					$el.queryBtn.on('click', function(e) {
-						e.preventDefault();
-						queryData();
-					});
+            // Allow buttons to respond to on-click event
+            $el.queryBtn.on('click', function (e) {
+                e.preventDefault();
+                queryData();
+            });
 
-					// When this tab is shown to the user,
-					// run resize for page elements
-					$el.tab.on('shown', function(e) {
-						resizePageElements();
-					});
+            // When this tab is shown to the user,
+            // run resize for page elements
+            $el.tab.on('shown', function (e) {
+                resizePageElements();
+            });
 
-					return page;
-				};
+            return page;
+        };
 
-				// Show the tab if it's not currently selected
-				page.show = function() {
-					$el.tab.tab('show');
-					return page;
-				};
-				
-				// onShown event getter/setter
-				page.onShown = function(_) {
-					if (!arguments.length)
-						return events.onShown;
-					events.onShown = _;
-					return page;
-				};
+        // Show the tab if it's not currently selected
+        page.show = function () {
+            $el.tab.tab('show');
+            return page;
+        };
 
-				// ----- Private functions -----
-				// Set the page to "loading" state (user can't click on anything)
-				function enablePageLoading() {
-					$el.queryBtn.prop('disabled', true).text('Loading...').blur();
-				}
+        // ----- Private functions -----
+        // Set the page to "loading" state (user can't click on anything)
+        function enablePageLoading() {
+            $el.queryBtn.prop('disabled', true).text('Loading...').blur();
+        }
 
-				// Remove "loading" state from the page (user now allowed to interact with stuff)
-				function disablePageLoading() {
-					$el.queryBtn.prop('disabled', false).text('Refresh Data');
-				}
+        // Remove "loading" state from the page (user now allowed to interact with stuff)
+        function disablePageLoading() {
+            $el.queryBtn.prop('disabled', false).text('Refresh Data');
+        }
 
-				function queryData() {
-					enablePageLoading();
+        function queryData() {
+            enablePageLoading();
 
-					// Set ajax options for pulling data into the SlimGrid
-					grid.ajaxOptions({
-						url : "THE_URL",
-						type : "GET",
-						async : true,
-						datatype : "json"
-					}).render(); // Finally, render the grid
-				}
+            // Set ajax options for pulling data into the SlimGrid
+            grid.ajaxOptions({
+                url: "THE_URL",
+                type: "GET",
+                async: true,
+                datatype: "json"
+            }).render(); // Finally, render the grid
+        }
 
-				// Put page resize stuff here if needed
-				function resizePageElements() {
-					grid.resize(); // Calls SlickGrid resize functions
-				}
+        // Put page resize stuff here if needed
+        function resizePageElements() {
+            grid.resize(); // Calls SlickGrid resize functions
+        }
 
-				return page;
-			}
+        return page;
+    }
 
-		</script>
-	</body><!--/body -->
+</script>
+</body>
+<!--/body -->
 </html><!--/html -->
