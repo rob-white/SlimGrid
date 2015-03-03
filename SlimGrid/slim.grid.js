@@ -35,7 +35,7 @@ function SlimGrid() {
         container = $('body'),
         contextMenu = null,
         height = 600,
-        pk = 'ID',
+        pk = 'id',
         myGrid = $('<div class="slim-grid" style="height: ' + height + 'px; border-right: 1px solid #d3d3d3; border-left: 1px solid #d3d3d3; font-size: 11px !important;"></div>'),
         myPager = $('<div class="slim-pager"></div>'),
         selectionModel = 'row',
