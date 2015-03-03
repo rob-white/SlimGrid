@@ -4,6 +4,19 @@ A wrapper for [SlickGrid](https://github.com/mleibman/SlickGrid) to slim down th
 
 ## A Simple Example
 
+#### Code
+```javascript
+var container = $('body');
+var data = [{'id': 1, 'column': 'value'}, 
+			{'id': 2, 'column': 'value'}, 
+			{'id': 3, 'column': 'value'}];
+
+var grid = SlimGrid()
+	.container(container)
+	.primaryKey('id')
+	.render(data);
+```
+
 #### CSS
 ```html
     <link href="../css/slickgrid/slick.grid.css?v=1.0" rel="stylesheet" type="text/css"/>
@@ -40,19 +53,6 @@ A wrapper for [SlickGrid](https://github.com/mleibman/SlickGrid) to slim down th
     <script src="../js/underscore/underscore.js?v=1.0" type="text/javascript"></script>
 
     <script src="../slim.grid.js?v=1.0" type="text/javascript"></script>
-```
-
-#### Code
-```javascript
-var container = $('body');
-var data = [{'id': 1, 'column': 'value'}, 
-			{'id': 2, 'column': 'value'}, 
-			{'id': 3, 'column': 'value'}];
-
-var grid = SlimGrid()
-	.container(container)
-	.primaryKey('id')
-	.render(data);
 ```
 
 ## More Examples & Documentation
