@@ -482,12 +482,12 @@ function SlimGrid() {
         showLoadingIndicator(true);
 
         // Retrieve data from remote source
-        $.ajax({
-            async: ajaxOptions.async,
-            type: ajaxOptions.type,
-            url: ajaxOptions.url,
-            cache: ajaxOptions.cache,
-            dataType: ajaxOptions.dataType,
+        var defaultOptions = {
+            async: true,
+            type: "GET",
+            url: null,
+            cache: true,
+            dataType: "json",
             success: function (data) {
                 success(data);
             },
@@ -495,7 +495,9 @@ function SlimGrid() {
                 showLoadingIndicator(false);
                 err(error);
             }
-        });
+        };
+
+        $.ajax($.extend({}, defaultOptions, ajaxOptions));
     }
 
     function initGrid(data) {
