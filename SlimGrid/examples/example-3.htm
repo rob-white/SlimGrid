@@ -142,6 +142,7 @@
                     .showHeaderFilter(true)
                     .selectionModel("cell")
                     .columnFormatter(function (row, cell, value, columnDef, dataContext) {
+                        // Format cells based on key and/or value
                         if (columnDef['id'] == 'gender' && value == 'Female') {
                             return "<span class=\"special-cell\" style='background-color: rgb(39, 41, 214); color: #FFF'>" + value + "</span>";
                         }
@@ -156,8 +157,9 @@
 
                         return value;
                     }).columnOptions(function (key, column) {
-                        if (key == 'unneeded_column') column['hidden'] = true;
-                        if (key == 'score') column['width'] = 400; // Set width of population column to 400px
+                        // Add column options based on column key
+                        if (key == 'unneeded_column') column['hidden'] = true;  // Hide the "uneeded_column"
+                        if (key == 'score') column['width'] = 400;              // Set width of population column to 400px
 
                         return column;
                     }).slickgridOptions({

@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
-    <title>SlimGrid Example 1</title>
+    <title>SlimGrid Example 2</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -24,29 +24,74 @@
         #tab-container {
             margin-top: 80px;
         }
+
+        .unselectable-field {
+            background-color: #707981;
+            text-align: center;
+            color: #BCC7D1;
+        }
+
+        .context-menu {
+            background: #ffffff;
+            border: 1px solid gray;
+            padding: 2px;
+            display: inline-block;
+            min-width: 100px;
+            -moz-box-shadow: 2px 2px 2px silver;
+            -webkit-box-shadow: 2px 2px 2px silver;
+            z-index: 99999;
+        }
+
+        .context-menu li {
+            padding: 4px 4px 4px 4px;
+            list-style: none;
+            cursor: pointer;
+        }
+
+        .context-menu li.disabled {
+            cursor: default;
+            background-color: #C5C5C5;
+        }
+
+        .context-menu li:hover {
+            background-color: #E0E0E0;
+        }
     </style>
-</head><!--/head -->
+</head> <!--/head -->
 
 <html lang="en-us">
 <body>
 <div id="tab-container" class="container-fluid">
     <ul class="nav nav-tabs" id="tabs">
-        <li id="example-1-tab">
-            <a href="#example-1" data-toggle="tab">Example 1</a>
+        <li id="example-2-tab">
+            <a href="#example-2" data-toggle="tab">Example 1</a>
         </li>
-    </ul>
-    <!--/#tabs -->
+    </ul> <!--/#tabs -->
     <div class="tab-content">
-        <div class="tab-pane" id="example-1">
+        <div class="tab-pane" id="example-2">
             <div class="row-fluid">
-                <div id="example-1-table" class="span12"></div>
+                <div id="example-2-table" class="span7"></div>
+                <div class="span5">
+                    <h3 class="text-center">Overview</h3>
+                    <hr/>
+                    <ul>
+                        <li>Display context menu on right-click (if data is selected)</li>
+                        <li>Pull data from grid upon selecting context menu option</li>
+                        <li>Disable entire column from click events</li>
+                    </ul>
+                    <hr />
+                    <label><b>Selected Data:</b></label>
+                    <p id="data-display"></p>
+                </div>
             </div>
-        </div>
-        <!--/#example-1 -->
-    </div>
-    <!--/.tab-content -->
-</div>
-<!--/.tab-content -->
+        </div> <!--/#example-2 -->
+    </div> <!--/.tab-content -->
+</div> <!--/.tab-content -->
+
+<ul id="example-2-contextmenu" class="context-menu" style="position: absolute; display: none;">
+    <li id="contextmenu-option-1">Display Selected Data</li>
+    <li id="contextmenu-option-2">Say Hi</li>
+</ul>
 
 <!-- jQuery scripts -->
 <script src="../js/jquery/jquery-1.9.1.js?v=1.0" type="text/javascript"></script>
@@ -80,24 +125,25 @@
 <script src="../slim.grid.js?v=1.0" type="text/javascript"></script>
 
 <script type="text/javascript">
-    // Example 1
+    // Example 2
     $(document).ready(function () {
         // When jQuery's ready, initialize the example and show the tab
-        var example = Example1().init().show();
+        var example = Example2().init().show();
     });
 
-    function Example1() {
+    function Example2() {
         // Reference elements with jQuery
         var $el = {
-                    tab: $('#example-1-tab a'),
-                    gridContainer: $('#example-1-table')
+                    tab: $('#example-2-tab a'),
+                    contextMenu: $('#example-2-contextmenu'),
+                    dataDisplayContainer: $('#data-display'),
+                    gridContainer: $('#example-2-table')
                 },
                 gridHeight = 600,	// Set the height we want to use
                 grid = SlimGrid();	// Create a base SlimGrid
 
         // Constructor
-        function page() {
-        }
+        function page() { }
 
         // ----- Public functions -----
         page.init = function () {
@@ -119,6 +165,27 @@
                         defaultColumnWidth: 120,
                         forceFitColumns: false,
                         multiSelect: true
+                    })
+                    .columnOptions(function(key, column){
+                        // Disable mouseevents on column with key == "column1"
+                        if(key == 'column1'){
+                            column['selectable'] = false;
+                            column['focusable'] = false;
+                            column['cssClass'] = 'unselectable-field';
+                        }
+
+                        return column;
+                    })
+                    .contextMenu($el.contextMenu)
+                    .onContextMenuClick(function (e, selectedData) {
+                        // If the context menu option with this id is selected...
+                        if ($(e.target).attr('id') == 'contextmenu-option-1') {
+                            $el.dataDisplayContainer.html(JSON.stringify(selectedData));
+                        }
+
+                        if($(e.target).attr('id') == 'contextmenu-option-2'){
+                            $el.dataDisplayContainer.html('Hi!');
+                        }
                     })
                     .render(data); 				// Add data to grid and render
 
@@ -155,6 +222,5 @@
     }
 
 </script>
-</body>
-<!--/body -->
-</html><!--/html -->
+</body> <!--/body -->
+</html> <!--/html -->
