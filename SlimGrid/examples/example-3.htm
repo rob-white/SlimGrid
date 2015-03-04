@@ -140,8 +140,8 @@
                     .downloadable(true)
                     .showColumnpicker(false)
                     .showHeaderFilter(true)
-                    .selectionModel("cell")
-                    .columnFormatter(function (row, cell, value, columnDef, dataContext) {
+                    .selectionModel(new Slick.CellSelectionModel)
+                    .cellFormatter(function (row, cell, value, columnDef, dataContext) {
                         // Format cells based on key and/or value
                         if (columnDef['id'] == 'gender' && value == 'Female') {
                             return "<span class=\"special-cell\" style='background-color: rgb(39, 41, 214); color: #FFF'>" + value + "</span>";
@@ -156,18 +156,21 @@
                         }
 
                         return value;
-                    }).columnOptions(function (key, column) {
+                    })
+                    .columnOptions(function (key, column) {
                         // Add column options based on column key
                         if (key == 'unneeded_column') column['hidden'] = true;  // Hide the "uneeded_column"
                         if (key == 'score') column['width'] = 400;              // Set width of population column to 400px
 
                         return column;
-                    }).slickgridOptions({
+                    })
+                    .slickgridOptions({
                         // Any of SlickGrid's options can be applied here
                         defaultColumnWidth: 90,
                         forceFitColumns: false,
                         multiSelect: true
-                    }).beforeRender(function (data) {
+                    })
+                    .beforeRender(function (data) {
                         // Called after data is pulled, but before
                         // the grid is actually rendered on screen
                         if (data.length == 0) alert("Oh no! There isn't any data!");
@@ -178,7 +181,8 @@
                         // If there was an error rendering the grid...
                         // do something here
                         if(error) alert('AHHHHHHH, an error!');
-                    }).afterRender(function () {
+                    })
+                    .afterRender(function () {
                         // Called after the grid is rendered on screen
                         disablePageLoading();
                     });

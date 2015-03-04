@@ -134,7 +134,7 @@
                     .downloadable(true)				// Download data (csv) link provided at bottom of grid
                     .showColumnpicker(false)		// Don't use column filter plugin on right-click of column headers
                     .showHeaderFilter(true)			// Filter plugin added to column headers
-                    .selectionModel("cell")			// Cells are selectable (default 'rows')
+                    .selectionModel(new Slick.CellSelectionModel)
                     .slickgridOptions({
                         // Any of SlickGrid's options can be applied here
                         defaultColumnWidth: 120,
@@ -177,6 +177,5 @@
     }
 
 </script>
-</body>
-<!--/body -->
+</body><!--/body -->
 </html><!--/html -->

@@ -159,7 +159,7 @@
                     .downloadable(true)				// Download data (csv) link provided at bottom of grid
                     .showColumnpicker(false)		// Column filter plugin added to right-click of column headers
                     .showHeaderFilter(true)			// Filter plugin added to column headers
-                    .selectionModel("cell")			// Cells are selectable (default 'rows')
+                    .selectionModel(new Slick.CellSelectionModel)
                     .slickgridOptions({
                         // Any of SlickGrid's options can be applied here
                         defaultColumnWidth: 120,
@@ -167,8 +167,8 @@
                         multiSelect: true
                     })
                     .columnOptions(function(key, column){
-                        // Disable mouseevents on column with key == "column1"
-                        if(key == 'column1'){
+                        // Disable mouse events on column with key == "column1"
+                        if (key == 'column1') {
                             column['selectable'] = false;
                             column['focusable'] = false;
                             column['cssClass'] = 'unselectable-field';
