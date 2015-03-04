@@ -24,6 +24,9 @@ function SlimGrid() {
             forceFitColumns: false,
             multiSelect: false
         },
+        pk = 'id',
+        container = $('body'),
+        height = 600,
         exists = false,
         autoIncrement = false,
         downloadable = true,
@@ -31,14 +34,11 @@ function SlimGrid() {
         pasteExactOnly = false,
         showHeaderFilter = true,
         copyOut = false,
-        loadingIndicator = null, //$('<img style="vertical-align: text-bottom;" src=""/>')
-        container = $('body'),
-        contextMenu = null,
-        height = 600,
-        pk = 'id',
+        loadingIndicator = $('<span style="vertical-align: text-bottom; font-size: 10px">Loading...</span>'), //$('<img style="vertical-align: text-bottom;" src="IMG_SRC"/>')
+        contextMenu = $('<ul class="context-menu"></ul>'),
         myGrid = $('<div class="slim-grid" style="height: ' + height + 'px; border-right: 1px solid #d3d3d3; border-left: 1px solid #d3d3d3; font-size: 11px !important;"></div>'),
         myPager = $('<div class="slim-pager"></div>'),
-        selectionModel = 'row',
+        selectionModel = new Slick.RowSelectionModel(),
         columnFilters = {},
         ajaxOptions = {
             async: false,
@@ -47,17 +47,16 @@ function SlimGrid() {
             cache: false,
             dataType: 'json'
         },
-        rowFormatter = function (row, dataview) {
-
+        rowFormatter = function (row) {
         },
-        columnFormatter = function (row, cell, value, columnDef, dataContext) {
+        cellFormatter = function (row, cell, value, columnDef, dataContext) {
             return value;
         },
         columnOptions = function (key, column) {
             return column;
         },
         events = {
-            onContextMenu: function (e, cell, gridview) {
+            onContextMenu: function (e, cell) {
             },
             onContextMenuClick: function (e, selectedData) {
             },
@@ -65,7 +64,7 @@ function SlimGrid() {
             },
             onRowSelected: function (e, selectedData) {
             },
-            onDataviewUpdate: function (e, args, gridview) {
+            onDataviewUpdate: function (e, args) {
             },
             onCellChange: function (cell) {
             },
@@ -90,33 +89,31 @@ function SlimGrid() {
             beforeRender: function (data) {
                 return data;
             },
-            afterRender: function (data, gridview) {
+            afterRender: function (data) {
             },
             onRenderError: function (error) {
             }
         },
         downloadId = generateUUID(),
-        gridview = null,
-        dataview = null,
-        columnpicker = null;
+        gridview, dataview, columnpicker;
 
     // Constructor
-    function grid() {
-    }
+    function grid() { }
 
     // Render the SlickGrid
     // If data isn't provided directly, we assume ajax request
     // Otherwise, we can't render the grid without data
     grid.render = function (data) {
-
+		// If there's a url and data parameter was not passed
         if (ajaxOptions.url && !arguments.length) {
+        	// Pull data remotely
             refreshData(function (data) {
-                var d = events.beforeRender(data);
-                if (d) data = d;
-
-                initGrid(data);
+                data = events.beforeRender.call(grid, data);
+				
+				if (data) initGrid(data);
+				else throw new Error('Data is undefined, unable to render grid');
             }, function (error) {
-                events.onRenderError(error);
+                events.onRenderError.call(grid, error);
                 throw new Error('There was an ajax error when retrieving remote data.');
             });
         }
@@ -124,13 +121,13 @@ function SlimGrid() {
             if (data) {
                 showLoadingIndicator(true);
 
-                var d = events.beforeRender(data);
-                if (d) data = d;
+                data = events.beforeRender.call(grid, data);
 
-                initGrid(data);
+				if (data) initGrid(data);
+				else throw new Error('Data is undefined, unable to render grid');
             }
             else {
-                events.onRenderError();
+                events.onRenderError.call(grid, 'Data undefined, unable to render grid');
                 throw new Error('No data passed to render function or url incorrect in ajax options.');
             }
         }
@@ -138,7 +135,7 @@ function SlimGrid() {
         return grid;
     };
 
-    // If the SlickGrid object already exists
+    // If the SlickGrid already exists
     // Resize the canvas to fit the page
     grid.resize = function () {
         if (exists) {
@@ -173,6 +170,7 @@ function SlimGrid() {
         return grid;
     };
 
+	// Getter/Setter for gridview (SlickGrid grid object)
     grid.gridview = function (_) {
         if (!arguments.length) return gridview;
         gridview = _;
@@ -180,6 +178,7 @@ function SlimGrid() {
         return grid;
     };
 
+	// Getter/Setter for dataview (SlickGrid DataView object)
     grid.dataview = function (_) {
         if (!arguments.length) return dataview;
         dataview = _;
@@ -201,6 +200,7 @@ function SlimGrid() {
         return grid;
     };
 
+	// Getter/Setter for primary key
     grid.primaryKey = function (_) {
         if (!arguments.length) return pk;
         pk = _;
@@ -208,6 +208,8 @@ function SlimGrid() {
         return grid;
     };
 
+	// Getter/Setter whether or not to auto create
+	// a unique primary key
     grid.autoIncrement = function (_) {
         if (!arguments.length) return autoIncrement;
         autoIncrement = _;
@@ -215,6 +217,7 @@ function SlimGrid() {
         return grid;
     };
 
+	// Getter/Setter for jQuery ajax options
     grid.ajaxOptions = function (_) {
         if (!arguments.length) return $.extend(true, {}, ajaxOptions);
         ajaxOptions = $.extend(ajaxOptions, _);
@@ -222,6 +225,8 @@ function SlimGrid() {
         return grid;
     };
 
+	// Getter/Setter for whether or not the
+	// grid has CSV download link
     grid.downloadable = function (_) {
         if (!arguments.length) return downloadable;
         downloadable = _;
@@ -229,6 +234,9 @@ function SlimGrid() {
         return grid;
     };
 
+	// Getter/Setter to check if data being pasted in
+	// the grid is required to match column schema exact
+	// -- This greatly speeds up pasting of large datasets
     grid.pasteExactOnly = function (_) {
         if (!arguments.length) return pasteExactOnly;
         pasteExactOnly = _;
@@ -236,9 +244,13 @@ function SlimGrid() {
         return grid;
     };
 
+	// Getter/Setter for SlickGrid options
+	// Applies options directly to grid object if it
+	// already exists
     grid.slickgridOptions = function (_) {
         if (!arguments.length) return slickgridOptions;
         slickgridOptions = $.extend(slickgridOptions, _);
+        
         if (gridview) {
             gridview.setOptions(_);
             gridview.invalidate();
@@ -247,6 +259,7 @@ function SlimGrid() {
         return grid;
     };
 
+	// Getter/Setter for loading indicator
     grid.loadingIndicator = function (_) {
         if (!arguments.length) return loadingIndicator;
         loadingIndicator = _;
@@ -254,6 +267,7 @@ function SlimGrid() {
         return grid;
     };
 
+	// Getter/Setter for rowFormatter callback function
     grid.rowFormatter = function (_) {
         if (!arguments.length) return rowFormatter;
         rowFormatter = _;
@@ -261,9 +275,9 @@ function SlimGrid() {
         return grid;
     };
 
-    grid.columnFormatter = function (_) {
-        if (!arguments.length) return columnFormatter;
-        columnFormatter = _;
+    grid.cellFormatter = function (_) {
+        if (!arguments.length) return cellFormatter;
+        cellFormatter = _;
 
         return grid;
     };
@@ -379,59 +393,79 @@ function SlimGrid() {
         return exists;
     };
 
-    // SlimGrid always uses a SlickGrid w/ dataview
-    // So grab and return the data from the dataview
-    grid.getData = function (_) {
+    // SlimGrid always uses a DataView
+    // So we grab and return the data from the SlickGrid dataview
+    grid.getData = function () {
         return dataview.getItems();
     };
 
-    // Add a row to the top of the grid
+    // Add a row at index
     // Refresh the dataview/grid to show the change
-    grid.addRow = function (_) {
-        dataview.insertItem(0, _);
+    /*grid.addRow = function (_, idx) {
+    	idx = idx ? idx : 0;
+        dataview.insertItem(idx, _);
         dataview.refresh();
-    };
+        
+        return grid;
+    };*/
 
-    // Add multiple rows to the top of the grid
-    grid.addRows = function (arr) {
-        dataview.beginUpdate();
-        arr.forEach(function (item) {
-            dataview.insertItem(0, item);
-        });
-        dataview.endUpdate();
-        dataview.refresh();
+    // Add multiple rows to the grid at
+    // an index (if specified)
+    grid.addRows = function (arr, idx) {
+    	idx = idx ? idx : 0;
+    	
+    	if (exists) {
+	        dataview.beginUpdate();
+	        arr.forEach(function (item) {
+	            dataview.insertItem(idx, item);
+	        });
+	        dataview.endUpdate();
+	        dataview.refresh();
+       	}
+       	
+       	return grid;
     };
 
     // Update a row given the primary key value
     // and the updated row object
-    grid.updateRow = function (p, _) {
-        dataview.updateItem(p, _);
-        dataview.refresh();
-    };
+    /*grid.updateRow = function (p, _) {
+    	
+    	if (exists) {
+	        dataview.updateItem(p, _);
+	        dataview.refresh();
+       	}
+       	
+        return grid;
+    };*/
 
     // Update multiple rows at once using the key
     // of the primary key value and the updated item
-    grid.updateRows = function (key, d) {
-        if (d.length > 0) {
+    grid.updateRows = function (arr) {
+        
+        if (arr.length > 0 && exists) {
             dataview.beginUpdate();
-            d.forEach(function (item) {
-                dataview.updateItem(item[key], item);
+            arr.forEach(function (item) {
+                dataview.updateItem(item[pk], item);
             });
             dataview.endUpdate();
             dataview.refresh();
         }
+        
+        return grid;
     };
 
-    // Returns true/false whether or not a row exists given
-    // the primary key value
-    grid.rowIdExists = function (p) {
-        return rowExists(p);
+    // Returns true/false whether or not a row
+    // exists given the primary key value
+    grid.rowIdExists = function (rowId) {
+        return rowExists(rowId);
     };
 
-    // If the grid is filtered, returns the data from that filtered set
-    // Creates a deep copy of each object (so we don't hold reference to data still in grid)
+    // If the grid is filtered, returns the data from that filtered
+    // set. Creates a deep copy of each object,
+    // so we don't hold reference to data still in grid)
     grid.getFilteredData = function () {
         var numRows = dataview.getLength(), data = [], i = 0;
+        
         while (i < numRows) {
             data.push($.extend(true, {}, dataview.getItem(i)));
             i++;
@@ -440,29 +474,28 @@ function SlimGrid() {
         return data;
     };
 
-    // Returns a dataset of the currently selected rows in
-    // the grid
+    // Returns a dataset of the currently
+    // selected rows in the grid
     grid.getSelectedRows = function () {
         return getSelectedRows();
     };
 
-
     // ----- Private functions -----
     // Returns true/false whether or not a row exists
-    // given a primary key value
-    //
-    // Underscore.js function currently used for finding row...
-    function rowExists(p) {
-        var d = dataview.getItems();
-        var found = _.find(d, function (item) {
-            return item[pk] == p;
+    // given a rowId (primary key) value
+    // Underscore.js is currently used for finding the row
+    // and will be removed as a dependency in the future
+    function rowExists(rowId) {
+        var data = dataview.getItems();
+        var found = _.find(data, function (item) {
+            return item[pk] == rowId;
         });
 
         return !found ? false : true;
     }
 
-    // Returns an array of the currently selected rows
-    // in the grid
+    // Returns an array of the currently
+    // selected rows in the grid
     function getSelectedRows() {
         var selectedData = [];
         if (exists) {
@@ -496,14 +529,15 @@ function SlimGrid() {
                 err(error);
             }
         };
-
+		
+		// Call jQuery ajax function
         $.ajax($.extend({}, defaultOptions, ajaxOptions));
     }
 
     function initGrid(data) {
         if (data.length > 0) {
 
-            // If we want a temporary key
+            // If SlimGrid needs to generate a unique key
             if (autoIncrement) {
                 var rowid = 0;
                 for (row in data) {
@@ -512,7 +546,7 @@ function SlimGrid() {
                 }
             }
 
-            // If the SlickGrid doesn't arleady exist
+            // If the grid doesn't already exist
             if (!exists) {
                 var standardColumns = [];
 
@@ -524,17 +558,19 @@ function SlimGrid() {
                             'name': key,
                             'field': key,
                             'sortable': true,
-                            'formatter': columnFormatter,
+                            'formatter': cellFormatter,
                             'cssClass': 'text-center'
                         };
+                        
                         // Override column options with user preferences
-                        column = columnOptions(key, column);
-                        column['formatter'] = columnFormatter;
+                        column = columnOptions.call(grid, key, column);
+                        column['formatter'] = cellFormatter;
 
                         var addColumn = true;
                         if (column.hasOwnProperty('hidden')) {
                             if (column['hidden']) addColumn = false;
                         }
+                        
                         if (addColumn) standardColumns.push(column);
                     }
                 }
@@ -582,6 +618,8 @@ function SlimGrid() {
                     }
                 };
 
+				// Underscore.js is used for parts of this filter
+				// This dependency will eventually be removed
                 function filter(item) {
                     // Regex pattern to validate numbers
                     // a number negative/positive with decimals with/without $, %
@@ -681,17 +719,18 @@ function SlimGrid() {
                     dataview = new Slick.Data.DataView({
                         groupItemMetadataProvider: groupItemMetadataProvider
                     });
+                    
                     gridview = new Slick.Grid(myGrid, dataview, standardColumns, slickgridOptions);
                     gridview.registerPlugin(groupItemMetadataProvider);
 
-                    if (selectionModel == 'cell') {
+                    /*if (selectionModel == 'cell') {
                         var cellSelector = new Slick.CellSelectionModel();
-                        gridview.setSelectionModel(cellSelector);
+                        gridview.setSelectionModel(selectionModel);
                     }
                     else {
-                        var rowSelector = new Slick.RowSelectionModel();
-                        gridview.setSelectionModel(rowSelector);
-                    }
+                        var rowSelector = new Slick.RowSelectionModel();*/
+                    gridview.setSelectionModel(selectionModel);
+                    //}
 
                     if (copyOut) {
                         var copyManager = new Slick.CellExternalCopyManager(pluginOptions);
@@ -742,12 +781,12 @@ function SlimGrid() {
                         }, true);
                     }
 
-                    if (selectionModel == 'row') {
+                    if (typeof selectionModel == 'RowSelectionModel') {
                         gridview.onSelectedRowsChanged.subscribe(function (e) {
                             var selectedIndexes = gridview.getSelectedRows(),
                                 selectedData = getSelectedRows();
 
-                            events.onRowSelected(e, selectedData);
+                            events.onRowSelected.call(grid, e, selectedData);
                             if (selectedIndexes.length > 0) gridview.setActiveCell(selectedIndexes[0], 0);
                         });
                     }
@@ -759,11 +798,11 @@ function SlimGrid() {
                             row[col['id']] = item.hasOwnProperty(col['id']) ? item[col['id']] : null;
                         });
 
-                        events.onAddNewRow(e, args, [row]);
+                        events.onAddNewRow.call(this, e, args, [row]);
                     });
 
                     dataview.onRowCountChanged.subscribe(function (e, args) {
-                        if (exists) events.onDataviewUpdate(e, args, gridview);
+                        if (exists) events.onDataviewUpdate.call(grid, e, args);
                         gridview.updateRowCount();
                         gridview.render();
                     });
@@ -833,7 +872,7 @@ function SlimGrid() {
 
                         contextMenu.click(function (e) {
                             var selectedData = getSelectedRows();
-                            events.onContextMenuClick(e, selectedData);
+                            events.onContextMenuClick.call(grid, e, selectedData);
                         });
                     }
 
@@ -866,12 +905,13 @@ function SlimGrid() {
                         gridview.registerPlugin(filterPlugin);
                     }
 
-                    gridview.init();
+                    gridview.init(); // Initialize the SlickGrid
 
                     // If we want the grid to be excel downloadable
                     var pager = $(myPager).find('.slick-pager');
+                	
+                	// Creates an Excel download link if the browser isn't old IE
                     if (downloadable) {
-                        // Creates an Excel download link if the browser isn't old IE
                         pager.append('<span id="' + downloadId + '" style="padding: 3px !important; font-size: 11px;"></span>');
                         createDownloadCSVButton('#' + downloadId + '', 'RawData', false, '', 'Download Data', data);
                     }
@@ -894,11 +934,11 @@ function SlimGrid() {
             }
         }
         else {
-            if (events.onRenderError) events.onRenderError();
+            if (events.onRenderError) events.onRenderError.call(grid, 'Dataset empty when trying to initialize the grid.');
             throw new Error('Dataset empty when trying to initialize grid.');
         }
 
-        events.afterRender(data, gridview);
+        events.afterRender.call(grid, data);
     }
 
     function updateGrid(data) {
@@ -924,7 +964,7 @@ function SlimGrid() {
 
                     // Override/merge column options with custom preferences
                     // Column formatter can probably be merged with columnOptions in a future update
-                    column = columnOptions(key, column);
+                    column = columnOptions.call(grid, key, column);
                     column['formatter'] = columnFormatter;
 
                     // Hide the column so it doesn't display in the grid
@@ -943,15 +983,15 @@ function SlimGrid() {
 
             // Set the new data into our dataview
             dataview.beginUpdate();
-            dataview.setItems(data);
+            dataview.setItems(data, pk);
             dataview.endUpdate();
 
             // Allow formatting of rows (color, etc.) using SlickGrid metadata access
             dataview.getItemMetadata = function (row) {
-                return rowFormatter(row, dataview);
+                return rowFormatter.call(grid, row);
             };
 
-            // Resize grid just in case
+			// Perform a resize
             gridview.invalidate();
             gridview.resizeCanvas();
 
@@ -959,8 +999,8 @@ function SlimGrid() {
         }
         else {
             showLoadingIndicator(false);
-            if (events.onRenderError) events.onRenderError();
-            throw new Error('Tried to call methods on Slickgrid object that does not exist.');
+            if (events.onRenderError) events.onRenderError.call(grid, 'Tried to call methods on SlickGrid object that does not exist.');
+            throw new Error('Tried to call methods on SlickGrid object that does not exist.');
         }
     }
 
@@ -972,7 +1012,7 @@ function SlimGrid() {
         }
     }
 
-    // Helper function for generating a unique identifier or download id/SlimGrid id
+    // Helper function for generating a unique identifier for download id/SlimGrid id
     function generateUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -1057,7 +1097,6 @@ function SlimGrid() {
 
 // External Copy Manager Plugin
 // Developed by: Nereo Labs
-//
 // https://github.com/Celebio/SlickGrid
 (function ($) {
     // register namespace
