@@ -23,6 +23,4 @@ var grid = SlimGrid()
 
 ## To-Do
 
-- Wiki (More examples and documentation)
-- Abstract up missing SlickGrid events/functions
-- Remove dependency to Underscore.js
+[Issues](https://github.com/rob-white/SlimGrid/issues)
