@@ -141,23 +141,41 @@
                     .showColumnpicker(false)
                     .showHeaderFilter(true)
                     .selectionModel(new Slick.CellSelectionModel)
-                    .cellFormatter(function (row, cell, value, columnDef, dataContext) {
-                        // Format cells based on key and/or value
-                        if (columnDef['id'] == 'gender' && value == 'Female') {
-                            return "<span class=\"special-cell\" style='background-color: rgb(39, 41, 214); color: #FFF'>" + value + "</span>";
-                        }
-
-                        if (columnDef['id'] == 'gender' && value == 'Male') {
-                            return "<span class=\"special-cell\" style='background-color: rgb(214, 10, 16); color: #FFF'>" + value + "</span>";
-                        }
-
-                        if (columnDef['id'] == 'score') {
-                            return "<span>" + value + " pts</span>";
-                        }
-
-                        return value;
-                    })
+//                    .cellFormatter(function (row, cell, value, columnDef, dataContext) {
+//                        // Format cells based on key and/or value
+//                        if (columnDef['id'] == 'gender' && value == 'Female') {
+//                            return "<span class=\"special-cell\" style='background-color: rgb(39, 41, 214); color: #FFF'>" + value + "</span>";
+//                        }
+//
+//                        if (columnDef['id'] == 'gender' && value == 'Male') {
+//                            return "<span class=\"special-cell\" style='background-color: rgb(214, 10, 16); color: #FFF'>" + value + "</span>";
+//                        }
+//
+//                        if (columnDef['id'] == 'score') {
+//                            return "<span>" + value + " pts</span>";
+//                        }
+//
+//                        return value;
+//                    })
                     .columnOptions(function (key, column) {
+
+                        column['formatter'] = function (row, cell, value, columnDef, dataContext) {
+                            // Format cells based on key and/or value
+                            if (columnDef['id'] == 'gender' && value == 'Female') {
+                                return "<span class=\"special-cell\" style='background-color: rgb(39, 41, 214); color: #FFF'>" + value + "</span>";
+                            }
+
+                            if (columnDef['id'] == 'gender' && value == 'Male') {
+                                return "<span class=\"special-cell\" style='background-color: rgb(214, 10, 16); color: #FFF'>" + value + "</span>";
+                            }
+
+                            if (columnDef['id'] == 'score') {
+                                return "<span>" + value + " pts</span>";
+                            }
+
+                            return value;
+                        };
+
                         // Add column options based on column key
                         if (key == 'unneeded_column') column['hidden'] = true;  // Hide the "uneeded_column"
                         if (key == 'score') column['width'] = 400;              // Set width of population column to 400px
