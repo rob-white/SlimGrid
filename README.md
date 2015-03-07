@@ -6,7 +6,6 @@ A wrapper for [SlickGrid](https://github.com/mleibman/SlickGrid) to slim down th
 
 #### Code
 ```javascript
-var container = $('body');
 var data = [
 	{'id': 1, 'column': 'value'}, 
 	{'id': 2, 'column': 'value'}, 
@@ -14,7 +13,7 @@ var data = [
 ];
 
 var grid = SlimGrid()
-	.container(container)
+	.container($('body'))
 	.render(data);
 ```
 
