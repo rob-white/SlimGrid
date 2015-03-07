@@ -54,6 +54,7 @@ function SlimGrid() {
         showColumnpicker = false,
         pasteExactOnly = false,
         showHeaderFilter = true,
+        showPagerStats = true,
         copyOut = false,
         // loadingIndicator can also be an image - example: $('<img style="vertical-align: text-bottom;" src="IMG_SRC"/>')
         loadingIndicator = $('<span style="vertical-align: text-bottom; font-size: 10px">Loading...</span>'),
@@ -130,7 +131,7 @@ function SlimGrid() {
             },
             onBeforeHeaderRowCellDestroy: function (e, args) {
             },
-            onBeforeDestory: function (e, args) {
+            onBeforeDestroy: function (e, args) {
             },
             onActiveCellChanged: function (e, args) {
             },
@@ -151,6 +152,8 @@ function SlimGrid() {
             onHeaderFilterClick: function (e, args) {
             },
             onHeaderMenuOptionClick: function (e, args) {
+            },
+            onSelectedRangesChanged: function (e, args) {
             },
             onDataviewUpdate: function (e, args) {
             },
@@ -411,6 +414,13 @@ function SlimGrid() {
     grid.selectionModel = function (_) {
         if (!arguments.length) return selectionModel;
         selectionModel = _;
+
+        return grid;
+    };
+
+    grid.showPagerStats = function (_) {
+        if (!arguments.length) return showPagerStats;
+        showPagerStats = _;
 
         return grid;
     };
@@ -897,8 +907,8 @@ function SlimGrid() {
                     });
 
                     // Event is fired right before the SlickGrid is destroyed
-                    gridview.onBeforeDestory.subscribe(function (e, args) {
-                        events.onBeforeDestory.call(grid, e, args);
+                    gridview.onBeforeDestroy.subscribe(function (e, args) {
+                        events.onBeforeDestroy.call(grid, e, args);
                     });
 
                     // Event is fired when the active cell is changed
@@ -935,6 +945,89 @@ function SlimGrid() {
                     gridview.onCellCssStylesChanged.subscribe(function (e, args) {
                         events.onCellCssStylesChanged.call(grid, e, args);
                     });
+
+                    if (selectionModel) {
+                        selectionModel.onSelectedRangesChanged.subscribe(function (e, args) {
+                            gridview.focus();
+                            events.onSelectedRangesChanged.call(grid, e, args);
+
+                            if (args.length != 0) {
+                                var columns = gridview.getColumns(),
+                                    selectedArr = [];
+
+                                for (var rg = 0; rg < args.length; rg++) {
+                                    var range = args[rg],
+                                        selectedRows = [];
+
+                                    for (var i = range.fromRow; i < range.toRow + 1; i++) {
+                                        var selectedCells = [],
+                                            dt = gridview.getDataItem(i);
+
+                                        for (var j = range.fromCell; j < range.toCell + 1; j++) {
+                                            selectedCells.push(getDataItemValueForColumn(dt, columns[j]));
+                                        }
+
+                                        selectedRows.push(selectedCells);
+                                    }
+
+                                    for (var k = 0; k < selectedRows.length; k++){
+                                        selectedArr.push(selectedRows[k]);
+                                    }
+                                }
+
+                                calculateStatistics(selectedArr);
+                            }
+                        });
+
+                        function getDataItemValueForColumn(item, columnDef) {
+                            var val = '';
+
+                            // If a custom getter is not defined, we call serializeValue of the editor to serialize
+                            if (columnDef.editor) {
+                                var editorArgs = {
+                                    'container': $("body"),  // a dummy container
+                                    'column': columnDef,
+                                    'position': { 'top': 0, 'left': 0 }  // a dummy position required by some editors
+                                };
+                                var editor = new columnDef.editor(editorArgs);
+
+                                editor.loadValue(item);
+                                val = editor.serializeValue();
+                                editor.destroy();
+                            }
+                            else {
+                                val = item[columnDef.field];
+                            }
+
+                            return val;
+                        }
+
+                        function calculateStatistics(selectionArray) {
+                            // Flatten the selected range (2d array)
+                            var flattened = [].concat.apply([], selectionArray);
+
+                            // Check if our values are numeric, if not
+                            // not just ignore the iteration
+                            var ignored = 0;
+                            var sum = flattened.reduce(function (a, b) {
+                                if (!$.isNumeric(a) || !$.isNumeric(b))
+                                    ignored++;
+
+                                a = $.isNumeric(a) ? a : 0;
+                                b = $.isNumeric(b) ? b : 0;
+
+                                return parseFloat(a) + parseFloat(b);
+                            });
+
+                            // Calculate sum/avg/count stats for selection
+                            sum = $.isNumeric(sum) ? Math.round(sum * 100)/100 : 0;
+                            var avg = flattened.length > ignored  ? Math.round((sum / (flattened.length - ignored))*100)/100 : 0;
+                            var count = flattened.length;
+
+                            var statString = 'Average: ' + avg + ' Count: ' + count + ' Sum: ' + sum;
+                            $(myPager).find('.slick-pager-statistics').text(statString);
+                        }
+                    }
 
                     // Allows for sorting when clicking on column header
                     // This and headerSorter will eventually be merged,
@@ -1130,8 +1223,10 @@ function SlimGrid() {
 
                     // If we want the grid to be excel downloadable
                     var pager = $(myPager).find('.slick-pager');
-                	
-                	// Creates an Excel download link if the browser isn't old IE
+                    // Create a holder for grid selection statistics
+                    pager.append('<span class="slick-pager-statistics" style="font-size: 11px; padding: 3px; float: right"></span>');
+
+                    // Creates an Excel download link if the browser isn't old IE
                     if (downloadable) {
                         pager.append('<span id="' + downloadId + '" style="padding: 3px !important; font-size: 11px;"></span>');
                         createDownloadCSVButton('#' + downloadId + '', 'RawData', false, '', 'Download Data', data);
