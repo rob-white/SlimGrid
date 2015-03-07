@@ -9,10 +9,31 @@
 
 function SlimGrid() {
 
-    // Some default SlickGrid options
-    // Option descriptions can be found in the SlickGrid docs here:
-    // https://github.com/mleibman/SlickGrid/wiki/Grid-Options
-    var slickgridOptions = {
+    // Default SlimGrid grid options
+    // Option descriptions can be found in the SlimGrid docs here:
+    // To-do
+    var slimgridOptions = {
+            pk: 'id',
+            height: 600,
+            autoIncrement: false,
+            downloadable: true,
+            showColumnpicker: false,
+            pasteExactOnly: false,
+            showHeaderFilter: true,
+            showPagerStats: true,
+            copyOut: false,
+            ajaxOptions: {
+                async: false,
+                type: 'GET',
+                url: '',
+                cache: false,
+                dataType: 'json'
+            }
+        },
+        // Default SlickGrid grid options
+        // Option descriptions can be found in the SlickGrid docs here:
+        // https://github.com/mleibman/SlickGrid/wiki/Grid-Options
+        slickgridOptions = {
             asyncEditorLoading: false,
             asyncEditorLoadDelay: 100,
             asyncPostRenderDelay: 50,
@@ -44,24 +65,6 @@ function SlimGrid() {
             showHeaderRow: true,
             syncColumnCellResize: false,
             topPanelHeight: 25
-        },
-        slimgridOptions = {
-            pk: 'id',
-            height: 600,
-            autoIncrement: false,
-            downloadable: true,
-            showColumnpicker: false,
-            pasteExactOnly: false,
-            showHeaderFilter: true,
-            showPagerStats: true,
-            copyOut: false,
-            ajaxOptions: {
-                async: false,
-                type: 'GET',
-                url: '',
-                cache: false,
-                dataType: 'json'
-            }
         },
         container = $('body'),
         contextMenu = $('<ul class="context-menu"></ul>'),
@@ -96,7 +99,7 @@ function SlimGrid() {
             },
             onDblClick: function (e, args) {
             },
-            onContextMenu: function (e, args, cell) {
+            onContextMenu: function (e, args, cell, gridview) {
             },
             onContextMenuClick: function (e, args, selectedData) {
             },
@@ -690,17 +693,20 @@ function SlimGrid() {
 
                     // Event is fired when the header context menu is shown
                     gridview.onHeaderContextMenu.subscribe(function (e, args) {
-                        events.onHeaderContextMenu.call(grid, e, args);
+                        if(events.hasOwnProperty('onHeaderContextMenu'))
+                            events.onHeaderContextMenu.call(grid, e, args);
                     });
 
                     // Event is fired when the column header is clicked
                     gridview.onHeaderClick.subscribe(function (e, args) {
-                        events.onHeaderClick.call(grid, e, args);
+                        if(events.hasOwnProperty('onHeaderClick'))
+                            events.onHeaderClick.call(grid, e, args);
                     });
 
                     // Event is fired when the grid is scrolled
                     gridview.onScroll.subscribe(function (e, args) {
-                        events.onScroll.call(grid, e, args);
+                        if(events.hasOwnProperty('onScroll'))
+                            events.onScroll.call(grid, e, args);
                     });
 
                     // Event is fired when the grid is sorted
@@ -712,22 +718,26 @@ function SlimGrid() {
 
                     // Event is fired when the mouse enters the grid
                     gridview.onMouseEnter.subscribe(function (e, args) {
-                        events.onMouseEnter.call(grid, e, args);
+                        if(events.hasOwnProperty('onMouseEnter'))
+                            events.onMouseEnter.call(grid, e, args);
                     });
 
                     // Event is fired when the mouse leaves the grid
                     gridview.onMouseLeave.subscribe(function (e, args) {
-                        events.onMouseLeave.call(grid, e, args);
+                        if(events.hasOwnProperty('onMouseLeave'))
+                            events.onMouseLeave.call(grid, e, args);
                     });
 
                     // Event is fired when mouse is clicked on the grid
                     gridview.onClick.subscribe(function (e, args) {
-                        events.onClick.call(grid, e, args);
+                        if(events.hasOwnProperty('onClick'))
+                            events.onClick.call(grid, e, args);
                     });
 
                     // Event is fired when mouse is double clicked on the grid
                     gridview.onDblClick.subscribe(function (e, args) {
-                        events.onDblClick.call(grid, e, args);
+                        if(events.hasOwnProperty('onDblClick'))
+                            events.onDblClick.call(grid, e, args);
                     });
 
                     // Event is fired when key is down when grid is focused
@@ -735,87 +745,103 @@ function SlimGrid() {
                     // since the plugin for copying uses this subscription
                     if(!slimgridOptions.copyOut) {
                         gridview.onKeyDown.subscribe(function (e, args) {
-                            events.onKeyDown.call(grid, e, args);
+                            if(events.hasOwnProperty('onKeyDown'))
+                                events.onKeyDown.call(grid, e, args);
                         });
                     }
 
                     // Event is fired when a cell edit attempt is made
                     // but the edit violates the cell's validation function
                     gridview.onValidationError.subscribe(function (e, args) {
-                        events.onValidationError.call(grid, e, args);
+                        if(events.hasOwnProperty('onValidationError'))
+                            events.onValidationError.call(grid, e, args);
                     });
 
                     // Event is fired when the grid's viewport changes size (width/height)
                     gridview.onViewportChanged.subscribe(function (e, args) {
-                        events.onViewportChanged.call(grid, e, args);
+                        if(events.hasOwnProperty('onViewportChanged'))
+                            events.onViewportChanged.call(grid, e, args);
                     });
 
                     // Event is fired when column(s) are dragged
                     // to a different position
                     gridview.onColumnsReordered.subscribe(function (e, args) {
-                        events.onColumnsReordered.call(grid, e, args);
+                        if(events.hasOwnProperty('onColumnsReordered'))
+                            events.onColumnsReordered.call(grid, e, args);
                     });
 
                     // Event is fired when column(s) are resized
                     gridview.onColumnsResized.subscribe(function (e, args) {
-                        events.onColumnsResized.call(grid, e, args);
+                        if(events.hasOwnProperty('onColumnsResized'))
+                            events.onColumnsResized.call(grid, e, args);
                     });
 
                     // Event is fired before a cell changes into edit mode
                     gridview.onBeforeEditCell.subscribe(function (e, args) {
-                        events.onBeforeEditCell.call(grid, e, args);
+                        if(events.hasOwnProperty('onBeforeEditCell'))
+                            events.onBeforeEditCell.call(grid, e, args);
                     });
 
                     // Event is fired right before a cell in
                     // edit mode changes back to normal
                     gridview.onBeforeCellEditorDestroy.subscribe(function (e, args) {
-                        events.onBeforeCellEditorDestroy.call(grid, e, args);
+                        if(events.hasOwnProperty('onBeforeCellEditorDestroy'))
+                            events.onBeforeCellEditorDestroy.call(grid, e, args);
                     });
 
                     // Event is fired right before the SlickGrid is destroyed
                     gridview.onBeforeDestroy.subscribe(function (e, args) {
-                        events.onBeforeDestroy.call(grid, e, args);
+                        if(events.hasOwnProperty('onBeforeDestroy'))
+                            events.onBeforeDestroy.call(grid, e, args);
                     });
 
                     // Event is fired when the active cell is changed
                     gridview.onActiveCellChanged.subscribe(function (e, args) {
-                        events.onActiveCellChanged.call(grid, e, args);
+                        if(events.hasOwnProperty('onActiveCellChanged'))
+                            events.onActiveCellChanged.call(grid, e, args);
                     });
 
                     //
                     gridview.onActiveCellPositionChanged.subscribe(function (e, args) {
-                        events.onActiveCellPositionChanged.call(grid, e, args);
+                        if(events.hasOwnProperty('onActiveCellPositionChanged'))
+                            events.onActiveCellPositionChanged.call(grid, e, args);
                     });
 
                     // Event is fired when a drag is initialized
                     gridview.onDragInit.subscribe(function (e, args) {
-                        events.onDragInit.call(grid, e, args);
+                        if(events.hasOwnProperty('onDragInit'))
+                            events.onDragInit.call(grid, e, args);
                     });
 
                     // Event is fired on the start of a drag event
                     gridview.onDragStart.subscribe(function (e, args) {
-                        events.onDragStart.call(grid, e, args);
+                        if(events.hasOwnProperty('onDragStart'))
+                            events.onDragStart.call(grid, e, args);
                     });
 
                     // Event is fired when drag is occurring
                     gridview.onDrag.subscribe(function (e, args) {
-                        events.onDrag.call(grid, e, args);
+                        if(events.hasOwnProperty('onDrag'))
+                            events.onDrag.call(grid, e, args);
                     });
 
                     // Event is fired when drag event ends
                     gridview.onDragEnd.subscribe(function (e, args) {
-                        events.onDragEnd.call(grid, e, args);
+                        if(events.hasOwnProperty('onDragEnd'))
+                            events.onDragEnd.call(grid, e, args);
                     });
 
                     // Event is fired when a cell's css style changes
                     gridview.onCellCssStylesChanged.subscribe(function (e, args) {
-                        events.onCellCssStylesChanged.call(grid, e, args);
+                        if(events.hasOwnProperty('onCellCssStylesChanged'))
+                            events.onCellCssStylesChanged.call(grid, e, args);
                     });
 
                     if (slimgridOptions.showPagerStats && selectionModel) {
                         selectionModel.onSelectedRangesChanged.subscribe(function (e, args) {
                             gridview.focus();
-                            events.onSelectedRangesChanged.call(grid, e, args);
+                            if(events.hasOwnProperty('onSelectedRangesChanged'))
+                                events.onSelectedRangesChanged.call(grid, e, args);
 
                             if (args.length != 0) {
                                 var columns = gridview.getColumns(),
