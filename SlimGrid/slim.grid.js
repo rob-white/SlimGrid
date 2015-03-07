@@ -946,7 +946,7 @@ function SlimGrid() {
                         events.onCellCssStylesChanged.call(grid, e, args);
                     });
 
-                    if (selectionModel) {
+                    if (showPagerStats && selectionModel) {
                         selectionModel.onSelectedRangesChanged.subscribe(function (e, args) {
                             gridview.focus();
                             events.onSelectedRangesChanged.call(grid, e, args);
@@ -1006,26 +1006,33 @@ function SlimGrid() {
                             // Flatten the selected range (2d array)
                             var flattened = [].concat.apply([], selectionArray);
 
-                            // Check if our values are numeric, if not
-                            // not just ignore the iteration
-                            var ignored = 0;
-                            var sum = flattened.reduce(function (a, b) {
-                                if (!$.isNumeric(a) || !$.isNumeric(b))
-                                    ignored++;
+                            // Only include numerical values in our statistics
+                            var filtered = [];
+                            for (var i = 0; i < flattened.length; i ++){
+                                var value = flattened[i];
+                                if($.isNumeric(value)) filtered.push(value);
+                            }
 
-                                a = $.isNumeric(a) ? a : 0;
-                                b = $.isNumeric(b) ? b : 0;
+                            // Calculate sum/avg/count/min/max
+                            var sum = 0;
+                            if(filtered.length > 0) {
+                                sum = filtered.reduce(function (a, b) {
+                                    return parseFloat(a) + parseFloat(b);
+                                });
+                            }
 
-                                return parseFloat(a) + parseFloat(b);
-                            });
+                            var avg = filtered.length > 0 ? Math.round((sum / (filtered.length))*100)/100 : 0;
+                            var count = flattened.length; // Include non-numeric values in count
+                            var min = filtered.length > 0 ? Math.min.apply(null, filtered) : 0;
+                            var max = filtered.length > 0 ? Math.max.apply(null, filtered) : 0;
 
-                            // Calculate sum/avg/count stats for selection
-                            sum = $.isNumeric(sum) ? Math.round(sum * 100)/100 : 0;
-                            var avg = flattened.length > ignored  ? Math.round((sum / (flattened.length - ignored))*100)/100 : 0;
-                            var count = flattened.length;
-
-                            var statString = 'Average: ' + avg + ' Count: ' + count + ' Sum: ' + sum;
-                            $(myPager).find('.slick-pager-statistics').text(statString);
+                            // Update statistics section in the pager
+                            var statHtml = '<span style="padding-right: 10px">Average: ' + avg + '</span>';
+                            statHtml += '<span style="padding-right: 10px">Count: ' + count + '</span>';
+                            statHtml += '<span style="padding-right: 10px">Min: ' + min + '</span>';
+                            statHtml += '<span style="padding-right: 10px">Max: ' + max + '</span>';
+                            statHtml += '<span style="padding-right: 10px">Sum: ' + sum + '</span>';
+                            $(myPager).find('.slick-pager-statistics').html(statHtml);
                         }
                     }
 
