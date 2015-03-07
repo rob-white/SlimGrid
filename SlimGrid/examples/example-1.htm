@@ -43,7 +43,7 @@
                 <div class="span5">
                     <h3 class="text-center">Overview</h3>
                     <hr/>
-                    <a href="https://github.com/rob-white/SlimGrid/blob/master/SlimGrid/examples/example-1.htm">Example Code on Github</a>
+                    <a href="https://github.com/rob-white/SlimGrid/blob/master/SlimGrid/examples/example-1.htm">Source Code on Github</a>
                     <hr/>
                     <ul>
                         <li>Filter columns with either input field or header filter plugin drop-down</li>
@@ -113,11 +113,11 @@
     function Example1() {
         // Reference elements with jQuery
         var $el = {
-                    tab: $('#example-1-tab a'),
-                    gridContainer: $('#example-1-table')
-                },
-                gridHeight = 600,	// Set the height we want to use
-                grid = SlimGrid();	// Create a base SlimGrid
+                tab: $('#example-1-tab a'),
+                gridContainer: $('#example-1-table')
+            },
+            gridHeight = 600,	// Set the height we want to use
+            grid = SlimGrid();	// Create a base SlimGrid
 
         // Constructor
         function page() { }
@@ -129,21 +129,23 @@
 
             // Create a SlimGrid (SlickGrid) with options and formatting
             grid.container($el.gridContainer)	    // The container element of the grid (a jQuery element)
-                    .height(gridHeight)				// The height of the grid
-                    .primaryKey('id')				// Unique key for the data (required by SlickGrid)
-                    .autoIncrement(false)			// If we don't have a unique key, SlimGrid can auto-generate one
-                    .copyOut(true)					// Allow user to copy out data with ctrl-c
-                    .downloadable(true)				// Download data (csv) link provided at bottom of grid
-                    .showColumnpicker(false)		// Don't use column filter plugin on right-click of column headers
-                    .showHeaderFilter(true)			// Filter plugin added to column headers
-                    .selectionModel(new Slick.CellSelectionModel)
-                    .slickgridOptions({
-                        // Any of SlickGrid's options can be applied here
-                        defaultColumnWidth: 120,
-                        forceFitColumns: false,
-                        multiSelect: true
-                    })
-                    .render(data);                  // Add data to grid and render
+                .selectionModel(new Slick.CellSelectionModel)
+                .gridOptions({
+                    // SlickGrid options
+                    defaultColumnWidth: 120,
+                    forceFitColumns: false,
+                    multiSelect: true,
+
+                    // SlimGrid options
+                    pk: 'id',                   // Unique key for the data (required by SlickGrid)
+                    height: gridHeight,         // The height of the grid
+                    autoIncrement: false,       // If we don't have a unique key, SlimGrid can auto-generate one
+                    copyOut: true,              // Allow user to copy out data with ctrl-c
+                    downloadable: true,         // Download data (csv) link provided at bottom of grid
+                    showColumnPicker: false,    // Don't use column filter plugin on right-click of column headers
+                    showHeaderFilter: true      // Filter plugin added to column headers
+                })
+                .render(data);                  // Add data to grid and render
 
             // When this tab is shown to the user,
             // run resize for page elements

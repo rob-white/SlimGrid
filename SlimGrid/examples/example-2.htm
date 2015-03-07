@@ -64,7 +64,7 @@
 <div id="tab-container" class="container-fluid">
     <ul class="nav nav-tabs" id="tabs">
         <li id="example-2-tab">
-            <a href="#example-2" data-toggle="tab">Example 1</a>
+            <a href="#example-2" data-toggle="tab">Example 2</a>
         </li>
     </ul> <!--/#tabs -->
     <div class="tab-content">
@@ -74,7 +74,7 @@
                 <div class="span5">
                     <h3 class="text-center">Overview</h3>
                     <hr/>
-                    <a href="https://github.com/rob-white/SlimGrid/blob/master/SlimGrid/examples/example-2.htm">Example Code on Github</a>
+                    <a href="https://github.com/rob-white/SlimGrid/blob/master/SlimGrid/examples/example-2.htm">Source Code on Github</a>
                     <hr/>
                     <ul>
                         <li>Display context menu on right-click (if data is selected)</li>
@@ -154,33 +154,38 @@
 
             // Create a SlimGrid (SlickGrid) with options and formatting
             grid.container($el.gridContainer)	    // The container element of the grid (a jQuery element)
-                    .height(gridHeight)				// The height of the grid
-                    .primaryKey('id')				// Unique key for the data (required by SlickGrid)
-                    .autoIncrement(false)			// If we don't have a unique key, SlimGrid will auto-generate one
-                    .copyOut(true)					// Allow user to copy out data with ctrl-c
-                    .downloadable(true)				// Download data (csv) link provided at bottom of grid
-                    .showColumnpicker(false)		// Column filter plugin added to right-click of column headers
-                    .showHeaderFilter(true)			// Filter plugin added to column headers
-                    .selectionModel(new Slick.CellSelectionModel)
-                    .slickgridOptions({
-                        // Any of SlickGrid's options can be applied here
-                        defaultColumnWidth: 120,
-                        forceFitColumns: false,
-                        multiSelect: true
-                    })
-                    .columnOptions(function(key, column){
-                        // Disable mouse events on column with key == "column1"
-                        if (key == 'column1') {
-                            column['selectable'] = false;
-                            column['focusable'] = false;
-                            column['cssClass'] = 'unselectable-field';
-                        }
+                .contextMenu($el.contextMenu)       // The element we want to use as our context-menu
+                .selectionModel(new Slick.CellSelectionModel)
+                .gridOptions({
+                    // Any options (SlickGrid or SlimGrid) are applied here
+                    // -- SlickGrid Specific --
+                    defaultColumnWidth: 120,
+                    forceFitColumns: false,
+                    multiSelect: true,
 
-                        return column;
-                    })
-                    .contextMenu($el.contextMenu)
-                    .onContextMenuClick(function (e, selectedData) {
-                        // If the context menu option with this id is selected...
+                    // -- SlimGrid specific --
+                    pk: 'id',               // Unique key for the data that SlimGrid will reference
+                    height: gridHeight,     // The height of the grid
+                    autoIncrement: false,   // If we don't have a unique key, SlimGrid will auto-generate one
+                    copyOut: true,          // Allow user to copy out data with ctrl-c
+                    downloadable: true,     // Download data (csv) link provided at bottom of grid
+                    showColumnPicker: false,// Column filter plugin added to right-click of column headers
+                    showHeaderFilter: true  // Filter plugin added to column headers
+                })
+                .columnOptions(function(key, column){
+                    // Disable mouse events on column with key == "column1"
+                    if (key == 'column1') {
+                        column['selectable'] = false;
+                        column['focusable'] = false;
+                        column['cssClass'] = 'unselectable-field';
+                    }
+
+                    return column;
+                })
+                .events(function (events){
+                    // Add all events here
+                    events.onContextMenuClick = function(e, selectedData){
+                        // If the context menu option with this id is selected
                         if ($(e.target).attr('id') == 'contextmenu-option-1') {
                             $el.dataDisplayContainer.html(JSON.stringify(selectedData));
                         }
@@ -188,8 +193,11 @@
                         if($(e.target).attr('id') == 'contextmenu-option-2'){
                             $el.dataDisplayContainer.html('Hi!');
                         }
-                    })
-                    .render(data); 				// Add data to grid and render
+                    };
+
+                    return events;
+                })
+                .render(data);  // Add data to grid and render
 
             // When this tab is shown to the user,
             // run resize for page elements

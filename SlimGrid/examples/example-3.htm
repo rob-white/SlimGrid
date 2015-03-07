@@ -60,7 +60,7 @@
                 <div class="span5">
                     <h3 class="text-center">Overview</h3>
                     <hr/>
-                    <a href="https://github.com/rob-white/SlimGrid/blob/master/SlimGrid/examples/example-3.htm">Example Code on Github</a>
+                    <a href="https://github.com/rob-white/SlimGrid/blob/master/SlimGrid/examples/example-3.htm">Source Code on Github</a>
                     <hr/>
                     <ul>
                         <li>Request data remotely using an endpoint url that returns JSON</li>
@@ -121,75 +121,92 @@
     function Example3() {
 
         var $el = {
-                    tab: $('#example-3-tab a'),
-                    queryBtn: $('#example-3-query-btn'),
-                    gridContainer: $('#example-3-table')
-                },
-                gridHeight = 600,
-                grid = SlimGrid();
+                tab: $('#example-3-tab a'),
+                queryBtn: $('#example-3-query-btn'),
+                gridContainer: $('#example-3-table')
+            },
+            gridHeight = 600,
+            grid = SlimGrid();
 
         // Constructor
         function page() { }
 
         // ----- Public -----
         page.init = function () {
+            enablePageLoading();
 
-            // Create a SlimGrid (SlickGrid) with options and formatting
+            // Create a SlimGrid with options and formatting
             grid.container($el.gridContainer)
-                    .height(gridHeight)
-                    .copyOut(true)
-                    .autoIncrement(true)    // Since the data set we're pulling doesn't have a unique key, auto generate one
-                    .downloadable(true)
-                    .showColumnpicker(false)
-                    .showHeaderFilter(true)
-                    .selectionModel(new Slick.CellSelectionModel)
-                    .columnOptions(function (key, column) {
+                .selectionModel(new Slick.CellSelectionModel)
+                .gridOptions({
+                    // SlickGrid
+                    defaultColumnWidth: 90,
+                    forceFitColumns: false,
+                    multiSelect: true,
 
-                        column['formatter'] = function (row, cell, value, columnDef, dataContext) {
-                            // Format cells based on key and/or value
-                            if (columnDef['id'] == 'gender' && value == 'Female') {
-                                return "<span class=\"special-cell\" style='background-color: rgb(39, 41, 214); color: #FFF'>" + value + "</span>";
-                            }
+                    // SlimGrid
+                    height: gridHeight,
+                    copyOut: true,
+                    autoIncrement: true, // Since the data set we're pulling doesn't have a unique key, auto generate one
+                    downloadable: true,
+                    showColumnPicker: true,
+                    showHeaderFilter: true,
+                    ajaxOptions: {
+                        url: "http://example.url.com/data.json",
+                        type: "GET",
+                        fake: true,
+                        async: true,
+                        datatype: "jsonp"
+                    }
+                })
+                .columnOptions(function (key, column) {
 
-                            if (columnDef['id'] == 'gender' && value == 'Male') {
-                                return "<span class=\"special-cell\" style='background-color: rgb(214, 10, 16); color: #FFF'>" + value + "</span>";
-                            }
+                    column['formatter'] = function (row, cell, value, columnDef, dataContext) {
+                        // Format cells based on key and/or value
+                        if (columnDef['id'] == 'gender' && value == 'Female') {
+                            return "<span class=\"special-cell\" style='background-color: rgb(39, 41, 214); color: #FFF'>" + value + "</span>";
+                        }
 
-                            if (columnDef['id'] == 'score') {
-                                return "<span>" + value + " pts</span>";
-                            }
+                        if (columnDef['id'] == 'gender' && value == 'Male') {
+                            return "<span class=\"special-cell\" style='background-color: rgb(214, 10, 16); color: #FFF'>" + value + "</span>";
+                        }
 
-                            return value;
-                        };
+                        if (columnDef['id'] == 'score') {
+                            return "<span>" + value + " pts</span>";
+                        }
 
-                        // Add column options based on column key
-                        if (key == 'unneeded_column') column['hidden'] = true;  // Hide the "uneeded_column"
-                        if (key == 'score') column['width'] = 400;              // Set width of population column to 400px
+                        return value;
+                    };
 
-                        return column;
-                    })
-                    .slickgridOptions({
-                        // Any of SlickGrid's options can be applied here
-                        defaultColumnWidth: 90,
-                        forceFitColumns: false,
-                        multiSelect: true
-                    })
-                    .beforeRender(function (data) {
-                        // Called after data is pulled, but before
-                        // the grid is actually rendered on screen
+                    // Add column options based on column key
+                    if (key == 'unneeded_column') column['hidden'] = true;  // Hide the "uneeded_column"
+                    if (key == 'score') column['width'] = 400;              // Set width of population column to 400px
+
+                    return column;
+                })
+                .events(function(events){
+                    // Called after data is pulled, but before
+                    // the grid is actually rendered on screen
+                    events.beforeRender = function(data){
                         if (data.length == 0) alert("Oh no! There isn't any data!");
 
                         return data;
-                    })
-                    .onRenderError(function(error){
-                        // If there was an error rendering the grid...
-                        // do something here
-                        if(error) alert('AHHHHHHH, an error!');
-                    })
-                    .afterRender(function () {
-                        // Called after the grid is rendered on screen
+                    };
+
+                    // Called after the grid is rendered on screen
+                    events.afterRender = function (data){
                         disablePageLoading();
-                    });
+                    };
+
+                    // If there was an error rendering the grid...
+                    // do something here
+                    events.onRenderError = function (error){
+                        if(error) alert('AHHHHHHH, an error!');
+                    };
+
+                    return events;
+                })
+                .render();
 
             // Allow buttons to respond to on-click event
             $el.queryBtn.on('click', function (e) {
@@ -203,7 +220,6 @@
                 resizePageElements();
             });
 
-            queryData(); // Auto query data when the page is loaded
             return page;
         };
 
@@ -225,21 +241,15 @@
         }
 
         function queryData() {
+            // Render the grid. If it already exists,
+            // just update the data/columns in the grid.
             enablePageLoading();
-
-            // Set ajax options for pulling data into the SlimGrid
-            grid.ajaxOptions({
-                url: "http://example.url.com/data.json",
-                type: "GET",
-                fake: true,
-                async: true,
-                datatype: "jsonp"
-            }).render(); // Finally, render the grid (if it already exists, just update the data/columns in the grid)
+            grid.render();
         }
 
-        // Put page resize stuff here if needed
         function resizePageElements() {
-            grid.resize(); // Calls SlickGrid resize functions
+            // Calls SlickGrid resize functions
+            grid.resize();
         }
 
         return page;
