@@ -633,7 +633,7 @@ function SlimGrid() {
                             'id': key,
                             'name': key,
                             'field': key,
-                            'sortable': true,
+                            'sortable': false,
                             'formatter': function (row, cell, value, columnDef, dataContext) {
                                 return value;
                             },
