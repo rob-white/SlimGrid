@@ -17,10 +17,10 @@ var grid = SlimGrid()
 	.render(data);
 ```
 
-## More Examples & Documentation
+## Examples & Documentation
 
 [Wiki](https://github.com/rob-white/SlimGrid/wiki)
 
-## To-Do
+## Feature Requests & Issues
 
 [Issues](https://github.com/rob-white/SlimGrid/issues)
