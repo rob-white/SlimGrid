@@ -17,7 +17,8 @@
         "PercentComplete": PercentCompleteEditor,
         "LongText": LongTextEditor,
         "TrueFalseSelect": TrueFalseSelectEditor,
-        "RemoteSelect": RemoteSelectEditor
+        "RemoteSelect": RemoteSelectEditor,
+        "Color": ColorEditor
       }
     }
   });
@@ -318,12 +319,10 @@
       };
 
       this.loadValue = function (item) {
-          //$select.val(defaultValue = item[args.column.field].toString());
-          //$select.select();
       };
 
       this.serializeValue = function () {
-          return null;
+          return $select.val();
       };
 
       this.applyValue = function (item, state) {
@@ -343,6 +342,81 @@
 
       this.init();
   }
+
+function ColorEditor(args) {
+    var $input;
+    var defaultValue;
+    var scope = this;
+
+    this.init = function () {
+        $input = $("<INPUT type=text class='editor-text' />");
+        $input.appendTo(args.container);
+        $input.focus().select();
+        if($.fn.spectrum) {
+            $input.spectrum({
+                flat: true,
+                showInitial: true,
+                preferredFormat: "hex",
+                showInput: true,
+                clickoutFiresChange: true,
+                showButtons: false
+            });
+        }
+        else{
+            throw new Error('This editor requires the spectrum.js/spectrum.css plugin to work.');
+        }
+    };
+
+    this.destroy = function () {
+        $input.spectrum("hide");
+        $input.spectrum("destroy");
+        $input.remove();
+    };
+
+    this.show = function () {
+        $input.spectrum("show");
+    };
+
+    this.hide = function () {
+        $input.spectrum("hide");
+    };
+
+    this.position = function (position) {
+    };
+
+    this.focus = function () {
+    };
+
+    this.loadValue = function (item) {
+        defaultValue = item[args.column.field];
+        $input.val(defaultValue);
+        $input[0].defaultValue = defaultValue;
+        $input.select();
+        $input.spectrum("set", defaultValue);
+    };
+
+    this.serializeValue = function () {
+        return $input.spectrum('get').toHexString();
+    };
+
+    this.applyValue = function (item, state) {
+        item[args.column.field] = state;
+    };
+
+    this.isValueChanged = function () {
+        console.log($input.spectrum('get').toHexString());
+        return (!($input.spectrum('get').toHexString() == "" && defaultValue == null)) && ($input.spectrum('get').toHexString() != defaultValue);
+    };
+
+    this.validate = function () {
+        return {
+            valid: true,
+            msg: null
+        };
+    };
+
+    this.init();
+}
 
   function TrueFalseSelectEditor(args) {
       var $select;
