@@ -84,6 +84,7 @@ function SlimGrid() {
         filter = function(item) {
             return true;
         },
+        grouping = [],
         // Available SlimGrid events
         events = {
             onScroll: function (e, args) {
@@ -180,7 +181,7 @@ function SlimGrid() {
             }
         },
         downloadId = generateUUID(),
-        gridview, dataview;
+        gridview, dataview, groupItemMetadataProvider;
 
     // Constructor
     function grid() { }
@@ -389,6 +390,17 @@ function SlimGrid() {
     grid.filter = function (_) {
         if (!arguments.length) return filter;
         filter = _;
+
+        return grid;
+    };
+
+    grid.grouping = function (_) {
+        if (!arguments.length) return grouping;
+        grouping = _;
+
+        if(dataview){
+            dataview.setGrouping(grouping);
+        }
 
         return grid;
     };
@@ -687,7 +699,7 @@ function SlimGrid() {
                     myGrid.css('height', slimgridOptions.height + 'px');
 
                     // Create the grid's dataview
-                    var groupItemMetadataProvider = new Slick.Data.GroupItemMetadataProvider();
+                    groupItemMetadataProvider = new Slick.Data.GroupItemMetadataProvider();
                     dataview = new Slick.Data.DataView({
                         groupItemMetadataProvider: groupItemMetadataProvider
                     });
@@ -1020,7 +1032,24 @@ function SlimGrid() {
                     });
 
                     dataview.getItemMetadata = function (row) {
-                        return rowFormatter(row, dataview);
+                        var item = dataview.getItem(row);
+
+                        if (item === undefined) {
+                            return null;
+                        }
+
+                        // Overrides for grouping rows
+                        if (item.__group) {
+                            return groupItemMetadataProvider.getGroupRowMetadata(item);
+                        }
+                        else if (item.__groupTotals) {
+                            return groupItemMetadataProvider.getTotalsRowMetadata(item);
+                        }
+                        else {
+                            return rowFormatter(row, dataview);
+                        }
+
+                        return null;
                     };
 
                     // Create small delay timer for use when a
@@ -1153,6 +1182,8 @@ function SlimGrid() {
                     showLoadingIndicator(false);
                     if (loadingIndicator) pager.find('.slick-pager-status').after(loadingIndicator);
 
+                    dataview.setGrouping(grouping);
+
                     // At this point, the grid should be rendered
                     exists = true;
                     events.afterRender.call(grid, data);
@@ -1228,8 +1259,27 @@ function SlimGrid() {
             // Allow formatting of rows (color, etc.)
             // using SlickGrid's metadata access
             dataview.getItemMetadata = function (row) {
-                return rowFormatter.call(grid, row);
+                var item = dataview.getItem(row);
+
+                if (item === undefined) {
+                    return null;
+                }
+
+                // Overrides for grouping rows
+                if (item.__group) {
+                    return groupItemMetadataProvider.getGroupRowMetadata(item);
+                }
+                else if (item.__groupTotals) {
+                    return groupItemMetadataProvider.getTotalsRowMetadata(item);
+                }
+                else {
+                    return rowFormatter(row, dataview);
+                }
+
+                return null;
             };
+
+            dataview.setGrouping(grouping);
 
 			// Perform a resize
             gridview.invalidate();

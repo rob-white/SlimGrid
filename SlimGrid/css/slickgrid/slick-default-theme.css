@@ -13,25 +13,27 @@ classes should alter those!
 .slick-group-toggle {
   width: 9px;
   height: 9px;
-  margin-right: 10px !important;
-  margin-left: 10px !important;
+  margin-right: 5px;
+  /*margin-left: 10px !important;*/
 }
 
 .slick-group{
-    background: #e6e6e6 url(http://circuit2/dme/demetrics/css/jquery/smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x !important;   
+    border-bottom: 2px solid silver;
 }
 
 .slick-group-toggle.expanded {
-  background: url(http://circuit2/dme/demetrics/css/images/collapse.gif) no-repeat center center;
+  background: url(images/collapse.gif) no-repeat center center;
 }
 
 .slick-group-toggle.collapsed {
-  background: url(http://circuit2/dme/demetrics/css/images/expand.gif) no-repeat center center;
+  background: url(images/expand.gif) no-repeat center center;
 }
 
 .slick-group .slick-cell
 {
     text-align:left !important;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .slick-group-totals {
