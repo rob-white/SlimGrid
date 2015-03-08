@@ -21,6 +21,7 @@ function SlimGrid() {
             pasteExactOnly: false,
             showHeaderFilter: true,
             showPagerStats: true,
+            showCheckboxes: false,
             copyOut: false,
             ajaxOptions: {
                 async: false,
@@ -525,6 +526,14 @@ function SlimGrid() {
 
                 // Iterate through the first row so we can grab the
                 // columns and set their options
+
+                if(slimgridOptions.showCheckboxes){
+                    var checkboxSelector = new Slick.CheckboxSelectColumn({
+                        cssClass: "slick-cell-checkbox"
+                    });
+                    standardColumns.push(checkboxSelector.getColumnDefinition());
+                }
+
                 for (var key in data[0]) {
                     if (key != slimgridOptions.pk) {
 
@@ -552,7 +561,6 @@ function SlimGrid() {
                         if (addColumn) standardColumns.push(column);
                     }
                 }
-
 
                 var copyPastePluginOptions = {
                     clipboardCommandHandler: function (editCommand) {
@@ -707,6 +715,7 @@ function SlimGrid() {
                     // Create the grid and set its selection model (the grid is still not initialized)
                     gridview = new Slick.Grid(myGrid, dataview, standardColumns, slickgridOptions);
                     gridview.registerPlugin(groupItemMetadataProvider);
+                    if(slimgridOptions.showCheckboxes) gridview.registerPlugin(checkboxSelector);
                     gridview.setSelectionModel(selectionModel);
                     gridview.getCanvasNode().focus();
 
