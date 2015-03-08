@@ -136,13 +136,13 @@
     function Example() {
         // Reference elements with jQuery
         var $el = {
-                    tab: $('#example-2-tab a'),
-                    contextMenu: $('#example-2-contextmenu'),
-                    dataDisplayContainer: $('#data-display'),
-                    gridContainer: $('#example-2-table')
-                },
-                gridHeight = 600,	// Set the height we want to use
-                grid = SlimGrid();	// Create a base SlimGrid
+            tab: $('#example-2-tab a'),
+            contextMenu: $('#example-2-contextmenu'),
+            dataDisplayContainer: $('#data-display'),
+            gridContainer: $('#example-2-table')
+        },
+        gridHeight = 600,	// Set the height we want to use
+        grid = SlimGrid();	// Create a base SlimGrid
 
         // Constructor
         function page() { }
@@ -150,31 +150,31 @@
         // ----- Public functions -----
         page.init = function () {
 
-            var data = generateDummyData();		    // Create example data
+            // Create example data
+            var data = generateDummyData();
 
             // Create a SlimGrid (SlickGrid) with options and formatting
             grid.container($el.gridContainer)	    // The container element of the grid (a jQuery element)
                 .contextMenu($el.contextMenu)       // The element we want to use as our context-menu
                 .selectionModel(new Slick.CellSelectionModel)
                 .gridOptions({
-                    // Any options (SlickGrid or SlimGrid) are applied here
-                    // -- SlickGrid Specific --
+                    // -- SlickGrid --
                     defaultColumnWidth: 120,
                     forceFitColumns: false,
                     multiSelect: true,
 
-                    // -- SlimGrid specific --
-                    pk: 'id',               // Unique key for the data that SlimGrid will reference
-                    height: gridHeight,     // The height of the grid
-                    autoIncrement: false,   // If we don't have a unique key, SlimGrid will auto-generate one
-                    copyOut: true,          // Allow user to copy out data with ctrl-c
-                    downloadable: true,     // Download data (csv) link provided at bottom of grid
-                    showColumnPicker: false,// Column filter plugin added to right-click of column headers
-                    showHeaderFilter: true  // Filter plugin added to column headers
+                    // -- SlimGrid --
+                    pk: 'id',                       // Unique key for the data that SlimGrid will reference
+                    height: gridHeight,             // The height of the grid
+                    autoIncrement: false,           // If we don't have a unique key, SlimGrid will auto-generate one
+                    copyOut: true,                  // Allow user to copy out data with ctrl-c
+                    downloadable: true,             // Download data (csv) link provided at bottom of grid
+                    showColumnPicker: false,        // Column filter plugin added to right-click of column headers
+                    showHeaderFilter: true          // Filter plugin added to column headers
                 })
                 .columnOptions(function(key, column){
-                    // Disable mouse events on column with key == "column1"
-                    if (key == 'column1') {
+                    // Disable mouse events on columns
+                    if (key == 'column0' || key == 'column1') {
                         column['selectable'] = false;
                         column['focusable'] = false;
                         column['cssClass'] = 'unselectable-field';
@@ -215,17 +215,23 @@
         };
 
         // ----- Private functions -----
+        // Generate some dummy data
         function generateDummyData() {
             var data = [];
             for (var i = 0; i < 1000; i++) {
-                data.push({'id': i, 'column1': i * 2, 'column2': i * 3, 'column3': i * 4});
+                var row = { 'id': i };
+                for (var j = 0; j < 10; j++) {
+                    row['column' + j] = i*j;
+                }
+                data.push(row);
             }
+
             return data;
         }
 
-        // Put page resize stuff here if needed
         function resizePageElements() {
-            grid.resize(); 				// Calls SlickGrid resize
+            // Calls SlickGrid resize
+            grid.resize();
         }
 
         return page;

@@ -141,12 +141,12 @@
     function Example() {
 
         var $el = {
-                    tab: $('#example-4-tab a'),
-                    queryBtn: $('#example-4-query-btn'),
-                    gridContainer: $('#example-4-table')
-                },
-                gridHeight = 600,
-                grid = SlimGrid();
+            tab: $('#example-4-tab a'),
+            queryBtn: $('#example-4-query-btn'),
+            gridContainer: $('#example-4-table')
+        },
+        gridHeight = 600,
+        grid = SlimGrid();
 
         // Constructor
         function page() { }
@@ -157,120 +157,120 @@
 
             // Create a SlimGrid with options and formatting
             grid.container($el.gridContainer)
-                    .selectionModel(new Slick.CellSelectionModel)
-                    .gridOptions({
-                        // SlickGrid
-                        defaultColumnWidth: 230,
-                        forceFitColumns: false,
-                        multiSelect: true,
+                .selectionModel(new Slick.CellSelectionModel)
+                .gridOptions({
+                    // SlickGrid
+                    defaultColumnWidth: 230,
+                    forceFitColumns: false,
+                    multiSelect: true,
 
-                        // SlimGrid
-                        height: gridHeight,
-                        copyOut: true,
-                        autoIncrement: true, // Since the data set we're pulling doesn't have a unique key, auto generate one
-                        downloadable: true,
-                        showColumnPicker: true,
-                        showHeaderFilter: true,
-                        ajaxOptions: {
-                            url: "http://example.url.com/example4.json",
-                            type: "GET",
-                            fake: true,
-                            async: true,
-                            datatype: "jsonp"
+                    // SlimGrid
+                    height: gridHeight,
+                    copyOut: true,
+                    autoIncrement: true, // Since the data set we're pulling doesn't have a unique key, auto generate one
+                    downloadable: true,
+                    showColumnPicker: true,
+                    showHeaderFilter: true,
+                    ajaxOptions: {
+                        url: "http://example.url.com/example4.json",
+                        type: "GET",
+                        fake: true,
+                        async: true,
+                        datatype: "jsonp"
+                    }
+                })
+                .columnOptions(function (key, column) {
+                    var theGrid = this; // Get the SlimGrid
+                    column['formatter'] = function (row, cell, value, columnDef, dataContext) {
+                        // If we're looking at the player column
+                        // lets add our grouping stuff
+                        if(key == 'player') {
+                            var data = theGrid.getData();
+                            var dataview = theGrid.dataview();
+
+                            value = value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                            var spacer = "<span style='display:inline-block;height:1px;width:" + (15 * dataContext["indent"]) + "px'></span>";
+                            var idx = dataview.getIdxById(dataContext['id']);
+
+                            if (data[idx + 1] && data[idx + 1]['indent'] > data[idx]['indent']) {
+                                if (dataContext['_collapsed']) {
+                                    return spacer + " <span class='toggle expand'></span>&nbsp;" + value;
+                                }
+                                else {
+                                    return spacer + " <span class='toggle collapse'></span>&nbsp;" + value;
+                                }
+                            } else {
+                                return spacer + " <span class='toggle'></span>&nbsp;" + value;
+                            }
                         }
-                    })
-                    .columnOptions(function (key, column) {
-                        var theGrid = this; // Get the SlimGrid
-                        column['formatter'] = function (row, cell, value, columnDef, dataContext) {
-                            // If we're looking at the player column
-                            // lets add our grouping stuff
-                            if(key == 'player') {
-                                var data = theGrid.getData();
-                                var dataview = theGrid.dataview();
-
-                                value = value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                                var spacer = "<span style='display:inline-block;height:1px;width:" + (15 * dataContext["indent"]) + "px'></span>";
-                                var idx = dataview.getIdxById(dataContext['id']);
-
-                                if (data[idx + 1] && data[idx + 1]['indent'] > data[idx]['indent']) {
-                                    if (dataContext['_collapsed']) {
-                                        return spacer + " <span class='toggle expand'></span>&nbsp;" + value;
-                                    }
-                                    else {
-                                        return spacer + " <span class='toggle collapse'></span>&nbsp;" + value;
-                                    }
-                                } else {
-                                    return spacer + " <span class='toggle'></span>&nbsp;" + value;
-                                }
-                            }
-                            else{
-                                // Otherwise, just do our other formatting
-                                if (value == 'Female') {
-                                    return "<span class=\"special-cell\" style='background-color: rgb(39, 41, 214); color: #FFF'>" + value + "</span>";
-                                }
-
-                                if (value == 'Male') {
-                                    return "<span class=\"special-cell\" style='background-color: rgb(214, 10, 16); color: #FFF'>" + value + "</span>";
-                                }
-
-                                if (columnDef['id'] == 'score') {
-                                    return "<span>" + value + " pts</span>";
-                                }
+                        else{
+                            // Otherwise, just do our other formatting
+                            if (value == 'Female') {
+                                return "<span class=\"special-cell\" style='background-color: rgb(39, 41, 214); color: #FFF'>" + value + "</span>";
                             }
 
-                            return value;
-                        };
+                            if (value == 'Male') {
+                                return "<span class=\"special-cell\" style='background-color: rgb(214, 10, 16); color: #FFF'>" + value + "</span>";
+                            }
 
-                        // Add column options based on column key
-                        if (key == 'unneeded_column' || key == 'indent' || key == 'parent')
-                            column['hidden'] = true;    // Hide columns
-                        if (key == 'score')
-                            column['width'] = 400;      // Set width of score column to 400px
-
-                        return column;
-                    })
-                    .filter(function (item){
-                        var data = this.getData();
-                        if (item['parent'] != null) {
-                            var parent = data[item['parent']];
-                            while (parent) {
-                                if (parent['_collapsed']) {
-                                    return false;
-                                }
-                                parent = data[parent['parent']];
+                            if (columnDef['id'] == 'score') {
+                                return "<span>" + value + " pts</span>";
                             }
                         }
 
-                        return true;
-                    })
-                    .events(function(events){
+                        return value;
+                    };
 
-                        events.onClick = function (e, args){
-                            var theGrid = this;
-                            if ($(e.target).hasClass("toggle")) {
-                                var dataview = theGrid.dataview();
-                                var item = dataview.getItem(args.row);
-                                if (item) {
-                                    if (!item['_collapsed']) {
-                                        item['_collapsed'] = true;
-                                    }
-                                    else {
-                                        item['_collapsed'] = false;
-                                    }
-                                    dataview.updateItem(item['id'], item);
-                                }
-                                e.stopImmediatePropagation();
+                    // Add column options based on column key
+                    if (key == 'unneeded_column' || key == 'indent' || key == 'parent')
+                        column['hidden'] = true;    // Hide columns
+                    if (key == 'score')
+                        column['width'] = 400;      // Set width of score column to 400px
+
+                    return column;
+                })
+                .filter(function (item){
+                    var data = this.getData();
+                    if (item['parent'] != null) {
+                        var parent = data[item['parent']];
+                        while (parent) {
+                            if (parent['_collapsed']) {
+                                return false;
                             }
-                        };
+                            parent = data[parent['parent']];
+                        }
+                    }
 
-                        // Called after the grid is rendered on screen
-                        events.afterRender = function (data){
-                            disablePageLoading();
-                        };
+                    return true;
+                })
+                .events(function(events){
 
-                        return events;
-                    })
-                    .render();
+                    events.onClick = function (e, args){
+                        var theGrid = this;
+                        if ($(e.target).hasClass("toggle")) {
+                            var dataview = theGrid.dataview();
+                            var item = dataview.getItem(args.row);
+                            if (item) {
+                                if (!item['_collapsed']) {
+                                    item['_collapsed'] = true;
+                                }
+                                else {
+                                    item['_collapsed'] = false;
+                                }
+                                dataview.updateItem(item['id'], item);
+                            }
+                            e.stopImmediatePropagation();
+                        }
+                    };
+
+                    // Called after the grid is rendered on screen
+                    events.afterRender = function (data){
+                        disablePageLoading();
+                    };
+
+                    return events;
+                })
+                .render();
 
             // Allow buttons to respond to on-click event
             $el.queryBtn.on('click', function (e) {
