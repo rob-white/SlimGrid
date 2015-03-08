@@ -81,6 +81,9 @@ function SlimGrid() {
         columnOptions = function (key, column) {
             return column;
         },
+        filter = function(item) {
+            return true;
+        },
         // Available SlimGrid events
         events = {
             onScroll: function (e, args) {
@@ -382,11 +385,27 @@ function SlimGrid() {
         return grid;
     };
 
+    // Getter/Setter for filter addition
+    grid.filter = function (_) {
+        if (!arguments.length) return filter;
+        filter = _;
+
+        return grid;
+    };
+
     // --- Non-Chainable ---
     // Returns true/false whether or not the
     // SlickGrid has been created (rendered) or not
     grid.exists = function () {
         return exists;
+    };
+
+    grid.gridview = function () {
+        return gridview;
+    };
+
+    grid.dataview = function () {
+        return dataview;
     };
 
     // SlimGrid always uses a DataView
@@ -569,7 +588,7 @@ function SlimGrid() {
 
 				// Underscore.js is used for parts of this filter
 				// This dependency will eventually be removed
-                function filter(item) {
+                function theFilter(item) {
                     // Regex pattern to validate numbers
                     // a number negative/positive with decimals with/without $, %
                     var patRegex_no = /^[$]?[-+]?[0-9.,]*[$%]?$/,
@@ -631,7 +650,7 @@ function SlimGrid() {
                         }
                     }
 
-                    return value;
+                    return value && filter.call(grid, item);
                 }
 
                 // Available header input filter operators
@@ -1091,7 +1110,7 @@ function SlimGrid() {
                     // and the filter function
                     dataview.beginUpdate();
                     dataview.setItems(data, slimgridOptions.pk);
-                    dataview.setFilter(filter);
+                    dataview.setFilter(theFilter);
                     dataview.endUpdate();
 
                     if (slimgridOptions.showHeaderFilter) {
