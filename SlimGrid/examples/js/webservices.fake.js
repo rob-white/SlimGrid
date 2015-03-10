@@ -67,3 +67,19 @@ $.ajax.fake.registerWebservice('http://example.url.com/example5.json', function(
 
     return mockData;
 });
+
+$.ajax.fake.registerWebservice('http://example.url.com/example8.json', function(data) {
+    var mockData = [];
+
+    // prepare the data
+    for (var i = 0; i < 100; i++) {
+        var d = (mockData[i] = {});
+        d["id"] = i;
+        d["name"] = "User " + i;
+        d["email"] = "test.user@nospam.org";
+        d["title"] = "Regional sales manager";
+        d["phone"] = "206-000-0000";
+    }
+
+    return mockData;
+});

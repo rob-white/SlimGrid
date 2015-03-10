@@ -217,38 +217,6 @@
               }
             }
           }
-          
-            if (saveValues.length > 0) {
-                // Commit row changes to the database
-                for (var i = 0; i < saveValues.length; i++) {
-
-                    var pk = saveValues[i].pk;
-                    var column = saveValues[i].column;
-                    var value = saveValues[i].value;
-
-                    $.ajax({
-                        async: false,
-                        type: "POST",
-                        url: "./backend/uploadTableChanges.ashx",
-                        cache: false,
-                        data: { pk: pk, column: column, value: value },
-                        dataType: "html",
-                        success:
-                            function (html) {
-                                console.log(html);
-                            },
-                        error:
-                            function (ajaxdata) {
-                                $.pnotify({
-                                    title: 'Error',
-                                    text: 'There was an ajax error when trying to upload the changes you made. Please try again.',
-                                    type: 'error',
-                                    icon: false
-                                });
-                            }
-                    });
-                }
-            }
 
           var bRange = {
             'fromCell': activeCell,
@@ -264,59 +232,27 @@
 
         undo: function (pkColumnName) {
           var undoValues = [];
-          for (var y = 0; y < destH; y++){
-            for (var x = 0; x < destW; x++){
-              var desty = activeRow + y;
-              var destx = activeCell + x;
-              
-              if (desty < this.maxDestY && destx < this.maxDestX ) {
-                var nd = _grid.getCellNode(desty, destx);
-                var dt = _grid.getDataItem(desty);
+          for (var y = 0; y < destH; y++) {
+              for (var x = 0; x < destW; x++) {
+                  var desty = activeRow + y;
+                  var destx = activeCell + x;
 
-                var destPK = dt[pkColumnName];
-                var destColName = columns[destx]['id'];
-                var oldValue = this.oldValues[y][x];
+                  if (desty < this.maxDestY && destx < this.maxDestX) {
+                      var nd = _grid.getCellNode(desty, destx);
+                      var dt = _grid.getDataItem(desty);
 
-                undoValues.push({ 'pk': destPK, 'column': destColName, 'value': oldValue });
+                      var destPK = dt[pkColumnName];
+                      var destColName = columns[destx]['id'];
+                      var oldValue = this.oldValues[y][x];
 
-                if (oneCellToMultiple)
-                  this.setDataItemValueForColumn(dt, columns[destx], this.oldValues[0][0]);
-                else
-                  this.setDataItemValueForColumn(dt, columns[destx], this.oldValues[y][x]);
-                _grid.updateCell(desty, destx);
-              }
-            }
-          }
+                      undoValues.push({'pk': destPK, 'column': destColName, 'value': oldValue});
 
-          if (undoValues.length > 0) {
-              // Commit row changes to the database
-              for (var i = 0; i < undoValues.length; i++) {
-
-                  var pk = undoValues[i].pk;
-                  var column = undoValues[i].column;
-                  var value = undoValues[i].value;
-
-                  $.ajax({
-                      async: false,
-                      type: "POST",
-                      url: "./backend/uploadTableChanges.ashx",
-                      cache: false,
-                      data: { pk: pk, column: column, value: value },
-                      dataType: "html",
-                      success:
-                          function (html) {
-                              console.log(html);
-                          },
-                      error:
-                          function (ajaxdata) {
-                              $.pnotify({
-                                  title: 'Error',
-                                  text: 'There was an ajax error when trying to revert the changes you made.',
-                                  type: 'error',
-                                  icon: false
-                              });
-                          }
-                  });
+                      if (oneCellToMultiple)
+                          this.setDataItemValueForColumn(dt, columns[destx], this.oldValues[0][0]);
+                      else
+                          this.setDataItemValueForColumn(dt, columns[destx], this.oldValues[y][x]);
+                      _grid.updateCell(desty, destx);
+                  }
               }
           }
           
