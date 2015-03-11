@@ -39,13 +39,55 @@
             margin-bottom: 10px;
         }
 
-        .percent-complete-bar {
-            display: inline-block;
-            height: 6px;
-            -moz-border-radius: 3px;
-            -webkit-border-radius: 3px;
-            text-align: left !important;
-        }
+		.slick-cell {
+	      background: white !important;
+	      border-color: transparent !important;
+	      line-height: 19px !important;
+	    }
+	    
+	      /* alternating offsets */
+	    .slick-row .cell-inner {
+	      margin-right: 60px;
+	    }
+	    
+	    .slick-row[row$="1"] .cell-inner, .slick-row[row$="3"] .cell-inner, .slick-row[row$="5"] .cell-inner,
+	    .slick-row[row$="7"] .cell-inner, .slick-row[row$="9"] .cell-inner {
+	      margin-left: 60px;
+	      margin-right: 0;
+	    }
+	    
+	    .contact-card-cell {
+	      border-color: transparent !important;
+	    }
+	    
+	    .cell-inner {
+	      height: 80px;
+	      margin: 10px;
+	      padding: 10px;
+	      background: #fafafa;
+	      border: 1px solid gray;
+	      -moz-border-radius: 10px;
+	      -webkit-border-radius: 10px;
+	      -moz-box-shadow: 1px 1px 5px silver;
+	      -webkit-box-shadow: 1px 1px 5px silver;
+	      -webkit-transition: all 0.5s;
+	    }
+	    
+	    .cell-inner:hover {
+	      background: #f0f0f0;
+	    }
+	    
+	    .cell-left {
+	      width: 40px;
+	      height: 100%;
+	      float: left;
+	      border-right: 1px dotted gray;
+	      background: url("../css/slickgrid/images/user_identity.gif") no-repeat top center;
+	    }
+	    
+	    .cell-main {
+	      margin-left: 50px;
+	    }
     </style>
 </head><!--/head -->
 
@@ -71,8 +113,8 @@
                     <a href="https://github.com/rob-white/SlimGrid/blob/master/SlimGrid/examples/example-8.htm">Source Code on Github</a>
                     <hr/>
                     <ul>
-                        <li>Templates - TO-DO</li>
-                        <li><a href="http://mleibman.github.io/SlickGrid/examples/example-colspan.html">SlickGrid example that was used as a reference</a></li>
+                        <li>Template-based rendering using John Resig's <a href="http://ejohn.org/blog/javascript-micro-templating/">micro-templates</a> while still using SlickGrid's virtual rendering technology.</li>
+                        <li><a href="http://mleibman.github.io/SlickGrid/examples/example8-alternative-display.html">SlickGrid example that was used as a reference</a></li>
                     </ul>
                 </div>
             </div>
@@ -82,6 +124,19 @@
     <!--/.tab-content -->
 </div>
 <!--/.tab-content -->
+
+<!-- cell template -->
+<script type="text/html" id="cell_template">
+  <div class="cell-inner">
+    <div class="cell-left"></div>
+    <div class="cell-main">
+      <b><%=name%></b><br/>
+      <%=title%><br/>
+      <%=email%><br/>
+      <%=phone%>
+    </div>
+  </div>
+</script>
 
 <!-- jQuery scripts -->
 <script src="../js/jquery/jquery-1.9.1.js?v=1.0" type="text/javascript"></script>
@@ -139,18 +194,54 @@
 
         // ----- Public -----
         page.init = function () {
-            enablePageLoading();
+              enablePageLoading();
+
+
+			  var cache = {};
+			  // Simple JavaScript Templating
+			  // John Resig - http://ejohn.org/ - MIT Licensed
+			  (function () {
+			    var cache = {};
+			    this.tmpl = function tmpl(str, data) {
+			      // Figure out if we're getting a template, or if we need to
+			      // load the template - and be sure to cache the result.
+			      var fn = !/\W/.test(str) ?
+			          cache[str] = cache[str] ||
+			          tmpl(document.getElementById(str).innerHTML) :
+			        // Generate a reusable function that will serve as a template
+			        // generator (and which will be cached).
+			        new Function("obj",
+			            "var p=[],print=function(){p.push.apply(p,arguments);};" +
+			            // Introduce the data as local variables using with(){}
+			            "with(obj){p.push('" +
+			            // Convert the template into pure JavaScript
+			              str
+			                  .replace(/[\r\t\n]/g, " ")
+			                  .split("<%").join("\t")
+			                  .replace(/((^|%>)[^\t]*)'/g, "$1\r")
+			                  .replace(/\t=(.*?)%>/g, "',$1,'")
+			                  .split("\t").join("');")
+			                  .split("%>").join("p.push('")
+			                  .split("\r").join("\\'") + "');}return p.join('');");
+			      // Provide some basic currying to the user
+			      return data ? fn(data) : fn;
+			    };
+			  })();
+
+			var compiled_template = tmpl("cell_template");
 
             // Create a SlimGrid with options and formatting
             grid.container($el.gridContainer)
                 .selectionModel(new Slick.CellSelectionModel)
                 .gridOptions({
                     // SlickGrid
-                    defaultColumnWidth: 100,
+                    defaultColumnWidth: 400,
+                    rowHeight: 140,
                     forceFitColumns: false,
-                    multiSelect: true,
+                    multiSelect: false,
                     enableColumnReorder: false,
-
+					enableCellNavigation: false,
+					
                     // SlimGrid
                     pk: 'id',
                     height: gridHeight,
@@ -168,36 +259,14 @@
                 })
                 .columnOptions(function (key, column) {
 
-//                    if(key == 'num') column['name'] = '#';
-//
-//                    if(key == 'percentComplete'){
-//                        column['name'] = '% complete';
-//                        column['cssClass'] = 'text-left';
-//                    }
-//
-//                    if(key == 'effort') column['formatter'] = Slick.Formatters.Checkmark;
+					if(key != 'name') column['hidden'] = true;
+					
+					column['name'] = 'Contact';
+                   	column['formatter'] = function (row, cell, value, columnDef, dataContext) {
+						return compiled_template(dataContext);
+				   	};
 
-                    return column;
-                })
-                .rowFormatter(function(row){
-//                    if (row % 2 === 1) {
-//                        return {
-//                            "columns": {
-//                                "duration": {
-//                                    "colspan": 3
-//                                }
-//                            }
-//                        };
-//                    } else {
-//                        return {
-//                            "columns": {
-//                                "percentComplete": {
-//                                    "colspan": 5,
-//                                    "formatter": Slick.Formatters.PercentCompleteBar
-//                                }
-//                            }
-//                        };
-//                    }
+                   	return column;
                 })
                 .events(function(events){
 
