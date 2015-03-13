@@ -70,6 +70,7 @@ function SlimGrid() {
         container = $('body'),
         contextMenu = $('<ul class="context-menu"></ul>'),
         exists = false,
+        columnResized = false,
         // loadingIndicator can also be an image - example: $('<img style="vertical-align: text-bottom;" src="IMG_SRC"/>')
         loadingIndicator = $('<span style="font-size: 11px; padding: 3px; display: inline-block">Loading...</span>'),
         myGrid = $('<div class="slim-grid" style="height: ' + slimgridOptions.height + 'px; border-right: 1px solid #d3d3d3; border-left: 1px solid #d3d3d3; font-size: 11px !important;"></div>'),
@@ -84,6 +85,8 @@ function SlimGrid() {
         },
         filter = function(item) {
             return true;
+        },
+        plugins = function(gridview){
         },
         grouping = [],
         // Available SlimGrid events
@@ -387,6 +390,15 @@ function SlimGrid() {
         return grid;
     };
 
+    // Getter/Setter for plugins that can be
+    // applied to the Slickgrid grid object
+    grid.plugins = function (_) {
+        if (!arguments.length) return plugins;
+        plugins = _;
+
+        return grid;
+    };
+
     // Getter/Setter for filter addition
     grid.filter = function (_) {
         if (!arguments.length) return filter;
@@ -534,33 +546,39 @@ function SlimGrid() {
                     standardColumns.push(checkboxSelector.getColumnDefinition());
                 }
 
+                var colOrder = 0;
                 for (var key in data[0]) {
-                    if (key != slimgridOptions.pk) {
+                    // Default column options
+                    var column = {
+                        'id': key,
+                        'name': key,
+                        'field': key,
+                        'order': colOrder,
+                        'sortable': false,
+                        'formatter': function (row, cell, value, columnDef, dataContext) {
+                            return value;
+                        },
+                        'cssClass': 'text-center'
+                    };
 
-                        // Default column options
-                        var column = {
-                            'id': key,
-                            'name': key,
-                            'field': key,
-                            'sortable': false,
-                            'formatter': function (row, cell, value, columnDef, dataContext) {
-                                return value;
-                            },
-                            'cssClass': 'text-center'
-                        };
-                        
-                        // Override column options with user preferences
-                        column = columnOptions.call(grid, key, column);
+                    // Hide primary key column by default
+                    // Setting column['hidden'] = false will override this
+                    if (key == slimgridOptions.pk) column['hidden'] = true;
 
-                        // Allow columns to be hidden, if specified
-                        var addColumn = true;
-                        if (column.hasOwnProperty('hidden')) {
-                            if (column['hidden']) addColumn = false;
-                        }
-                        
-                        if (addColumn) standardColumns.push(column);
+                    // Override column options with user preferences
+                    column = columnOptions.call(grid, key, column);
+
+                    // Allow columns to be hidden, if specified
+                    var addColumn = true;
+                    if (column.hasOwnProperty('hidden')) {
+                        if (column['hidden']) addColumn = false;
                     }
+
+                    if (addColumn) standardColumns.push(column);
+                    colOrder++;
                 }
+
+                standardColumns.sort(function(a, b){ return a.order - b.order; });
 
                 var copyPastePluginOptions = {
                     clipboardCommandHandler: function (editCommand) {
@@ -719,6 +737,9 @@ function SlimGrid() {
                     gridview.setSelectionModel(selectionModel);
                     gridview.getCanvasNode().focus();
 
+                    // Allow any additional plugins be applied to the grid here
+                    plugins.call(grid, gridview);
+
                     // If we want the user to be able to copy data
                     // out of the grid with ctrl+c/command+c
                     if (slimgridOptions.copyOut) {
@@ -752,7 +773,12 @@ function SlimGrid() {
                     // Event is fired when the grid is sorted
                     gridview.onSort.subscribe(function (e, args) {
                         if (e.target.className != 'slick-header-menubutton') {
-                            sorterDefault(args.sortCols, dataview);
+                            if(!columnResized) {
+                                sorterDefault(args.sortCols, dataview);
+                            }
+                            else{
+                                columnResized = false;
+                            }
                         }
                     });
 
@@ -781,14 +807,10 @@ function SlimGrid() {
                     });
 
                     // Event is fired when key is down when grid is focused
-                    // NOTE: This won't work if the copyOut == true,
-                    // since the plugin for copying uses this subscription
-                    if(!slimgridOptions.copyOut) {
-                        gridview.onKeyDown.subscribe(function (e, args) {
-                            if(events.hasOwnProperty('onKeyDown'))
-                                events.onKeyDown.call(grid, e, args);
-                        });
-                    }
+                    gridview.onKeyDown.subscribe(function (e, args) {
+                        if(events.hasOwnProperty('onKeyDown'))
+                            events.onKeyDown.call(grid, e, args);
+                    });
 
                     // Event is fired when a cell edit attempt is made
                     // but the edit violates the cell's validation function
@@ -812,6 +834,7 @@ function SlimGrid() {
 
                     // Event is fired when column(s) are resized
                     gridview.onColumnsResized.subscribe(function (e, args) {
+                        columnResized = true;
                         if(events.hasOwnProperty('onColumnsResized'))
                             events.onColumnsResized.call(grid, e, args);
                     });
@@ -1157,7 +1180,6 @@ function SlimGrid() {
 
                         // This event is fired when a filter is selected
                         filterPlugin.onFilterApplied.subscribe(function (e, args) {
-
                             events.onHeaderFilterClick.call(grid, e, args);
 
                             dataview.refresh();
@@ -1224,36 +1246,40 @@ function SlimGrid() {
 
             var standardColumns = [];
 
+            var colOrder = 0;
             for (var key in data[0]) {
+                // Default column options
+                var column = {
+                    'id': key,
+                    'name': key,
+                    'field': key,
+                    'order': colOrder,
+                    'sortable': true,
+                    'formatter': function (row, cell, value, columnDef, dataContext) {
+                        return value;
+                    },
+                    'cssClass': 'text-center'
+                };
 
-                // By default, don't show the primary key column
-                if (key != slimgridOptions.pk) {
+                // Hide primary key column by default
+                // Setting column['hidden'] = false will override this
+                if (key == slimgridOptions.pk) column['hidden'] = true;
 
-                    // Default column options
-                    var column = {
-                        'id': key,
-                        'name': key,
-                        'field': key,
-                        'sortable': true,
-                        'formatter': function (row, cell, value, columnDef, dataContext) {
-                            return value;
-                        },
-                        'cssClass': 'text-center'
-                    };
+                // Override/merge default column options with custom preferences
+                column = columnOptions.call(grid, key, column);
 
-                    // Override/merge default column options with custom preferences
-                    column = columnOptions.call(grid, key, column);
-
-                    // Hide the column so it doesn't display in the grid
-                    // NOTE: The column is still available when accessing grid data
-                    var addColumn = true;
-                    if (column.hasOwnProperty('hidden')) {
-                        if (column['hidden']) addColumn = false;
-                    }
-
-                    if (addColumn) standardColumns.push(column);
+                // Hide the column so it doesn't display in the grid
+                // NOTE: The column is still available when accessing grid data
+                var addColumn = true;
+                if (column.hasOwnProperty('hidden')) {
+                    if (column['hidden']) addColumn = false;
                 }
+
+                if (addColumn) standardColumns.push(column);
+                colOrder++;
             }
+
+            standardColumns.sort(function(a, b){ return a.order - b.order; });
 
             // Set columns into SlickGrid
             gridview.setColumns(standardColumns);

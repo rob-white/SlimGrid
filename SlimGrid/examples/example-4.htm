@@ -136,6 +136,10 @@
     $(document).ready(function () {
         // When jQuery's ready, initialize the example and show the tab
         var example = Example().init().show();
+
+        $(window).on('resize', function(){
+            example.resize();
+        });
     });
 
     function Example() {
@@ -290,6 +294,11 @@
         // Show the tab if it's not currently selected
         page.show = function () {
             $el.tab.tab('show');
+            return page;
+        }
+
+        page.resize = function () {
+            resizePageElements();
             return page;
         };
 

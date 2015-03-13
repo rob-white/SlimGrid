@@ -24,47 +24,48 @@
         #tab-container {
             margin-top: 80px;
         }
-        
+
         .cell-effort-driven {
-	      text-align: center;
-	    }
-	    
-	    .cell-reorder {
-	      cursor: move;
-	      background: url("../css/slickgrid/images/drag-handle.png") no-repeat center center;
-	    }
-	    
-	    .cell-selection {
-	      border-right-color: silver;
-	      border-right-style: solid;
-	      background: #f5f5f5;
-	      color: gray;
-	      text-align: right;
-	      font-size: 10px;
-	    }
-	    
-	    .slick-row.selected .cell-selection {
-	      background-color: transparent; /* show default selected row background */
-	    }
-	    
-	    .recycle-bin {
-	      border: 1px solid gray;
-	      background: beige;
-	      padding: 4px;
-	      font-size: 12pt;
-	      font-weight: bold;
-	      color: black;
-	      text-align: center;
-	      -moz-border-radius: 10px;
-	    }
-	    
-	    .red {
-	      background: red;
-	    }
-	    
-	    .bold {
-	      font-weight: bold;
-	    }
+            text-align: center;
+        }
+
+        .cell-reorder {
+            cursor: move;
+            background: url("../css/slickgrid/images/drag-handle.png") no-repeat center center;
+        }
+
+        .cell-selection {
+            border-right-color: silver;
+            border-right-style: solid;
+            background: #f5f5f5;
+            color: gray;
+            text-align: right;
+            font-size: 10px;
+        }
+
+        .slick-row.selected .cell-selection {
+            background-color: transparent; /* show default selected row background */
+        }
+
+        .recycle-bin {
+            width: 200px;
+            border: 1px solid gray;
+            background: beige;
+            padding: 4px;
+            font-size: 12pt;
+            font-weight: bold;
+            color: black;
+            text-align: center;
+            -moz-border-radius: 10px;
+        }
+
+        .red {
+            background: red;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
     </style>
 </head><!--/head -->
 
@@ -87,17 +88,21 @@
                     <a href="https://github.com/rob-white/SlimGrid/blob/master/SlimGrid/examples/example-9.htm">Source Code on Github</a>
                     <hr/>
                     <ul>
-                        <li>TO-DO: Move and drag to recycle bin and expose ability to add plugins to SlimGrid</li>
+                        <li>Move and drag to recycle bin</li>
+                        <li><a href="http://mleibman.github.io/SlickGrid/examples/example9-row-reordering.html">SlickGrid example that was used as a reference</a></li>
                     </ul>
-                    <hr />
-                  	<div id="dropzone" class="row-fluid recycle-bin">
-						Recycle Bin
-					</div>
+                    <hr/>
+                    <div id="dropzone" class="recycle-bin">
+                        Recycle Bin
+                    </div>
                 </div>
             </div>
-  		</div><!--/#example-9 -->
-    </div><!--/.tab-content -->
-</div><!--/.tab-content -->
+        </div>
+        <!--/#example-9 -->
+    </div>
+    <!--/.tab-content -->
+</div>
+<!--/.tab-content -->
 
 <!-- jQuery scripts -->
 <script src="../js/jquery/jquery-1.9.1.js?v=1.0" type="text/javascript"></script>
@@ -136,6 +141,10 @@
     $(document).ready(function () {
         // When jQuery's ready, initialize the example and show the tab
         var example = Example().init().show();
+
+        $(window).on('resize', function(){
+           example.resize();
+        });
     });
 
     function Example() {
@@ -159,29 +168,206 @@
             grid.container($el.gridContainer)	    // The container element of the grid (a jQuery element)
                 .gridOptions({
                     // -- SlickGrid --
+                    editable: true,
+                    autoEdit: false,
+                    defaultColumnWidth: 60,
                     enableAddRow: true,
                     forceFitColumns: true,
                     multiSelect: true,
-                    editable: true,
-                    autoEdit: false,
                     enableCellNavigation: true,
 
                     // -- SlimGrid --
-                    pk: 'id',                       // Unique key for the data
                     height: gridHeight,             // The height of the grid
-                    autoIncrement: false,           // If we don't have a unique key, SlimGrid can auto-generate one
+                    autoIncrement: true,            // If we don't have a unique key, SlimGrid can auto-generate one
                     copyOut: false,                 // Allow user to copy out data with ctrl-c
                     downloadable: true,             // Download data (csv) link provided at bottom of grid
                     showColumnPicker: false,        // Don't use column filter plugin on right-click of column headers
-                    showHeaderFilter: true          // Filter plugin added to column headers
+                    showHeaderFilter: true,         // Filter plugin added to column headers
+                    showPagerStats: false
                 })
-                .columnOptions(function(key, column){
-                	return column;
+                .columnOptions(function (key, column) {
+
+                    if(key == 'id'){
+                        column['hidden'] = false;
+                        column['name'] = '';
+                        column['order'] = 0;
+                        column['behavior'] = 'selectAndMove';
+                        column['selectable'] = false;
+                        column['resizable'] = false;
+                        column['formatter'] = function (row, cell, value, columnDef, dataContext) {
+                            return '';
+                        };
+                        column['cssClass'] = 'cell-reorder dnd';
+                    }
+
+                    if(key == 'name'){
+                        column['width'] = 500;
+                        column['order'] = 1;
+                        column['cssClass'] = 'cell-title';
+                        column['editor'] = Slick.Editors.Text;
+                    }
+
+                    if(key == 'complete'){
+                        column['order'] = 2;
+                        column['cssClass'] = 'cell-effort-driven';
+                        column['cannotTriggerInsert'] = true;
+                        column['formatter'] = Slick.Formatters.Checkmark;
+                        column['editor'] = Slick.Editors.Checkbox;
+                    }
+
+                    return column;
                 })
-                .events(function(events){  	
-                	return events;
+                .plugins(function (gridview) {
+                    var dataview = this.dataview(),
+                            data = this.getData();
+
+                    var moveRowsPlugin = new Slick.RowMoveManager({
+                        cancelEditOnDrag: true
+                    });
+
+                    moveRowsPlugin.onBeforeMoveRows.subscribe(function (e, data) {
+                        for (var i = 0; i < data.rows.length; i++) {
+                            // no point in moving before or after itself
+                            if (data.rows[i] == data.insertBefore || data.rows[i] == data.insertBefore - 1) {
+                                e.stopPropagation();
+                                return false;
+                            }
+                        }
+                        return true;
+                    });
+
+                    moveRowsPlugin.onMoveRows.subscribe(function (e, args) {
+                        var data = grid.getData();
+                        var extractedRows = [], left, right;
+                        var rows = args.rows;
+                        var insertBefore = args.insertBefore;
+
+                        left = data.slice(0, insertBefore);
+                        right = data.slice(insertBefore, data.length);
+                        rows.sort(function(a,b) { return a-b; });
+
+                        for (var i = 0; i < rows.length; i++) {
+                            extractedRows.push(data[rows[i]]);
+                        }
+                        rows.reverse();
+
+                        for (var i = 0; i < rows.length; i++) {
+                            var row = rows[i];
+                            if (row < insertBefore) {
+                                left.splice(row, 1);
+                            } else {
+                                right.splice(row - insertBefore, 1);
+                            }
+                        }
+
+                        data = left.concat(extractedRows.concat(right));
+                        var selectedRows = [];
+                        for (var i = 0; i < rows.length; i++)
+                            selectedRows.push(left.length + i);
+
+                        gridview.resetActiveCell();
+                        grid.render(data);
+                        gridview.setSelectedRows(selectedRows);
+                    });
+
+                    gridview.registerPlugin(moveRowsPlugin);
+                })
+                .events(function (events) {
+                    events.onDragInit  = function(e, args) {
+                        e.stopImmediatePropagation();
+                    };
+
+                    events.onDragStart = function(e, args) {
+                        var gridview = this.gridview();
+                        var cell = gridview.getCellFromEvent(e);
+
+                        if (!cell) return;
+                        args.row = cell.row;
+
+                        if (!data[args.row] || Slick.GlobalEditorLock.isActive()) {
+                            return;
+                        }
+
+                        e.stopImmediatePropagation();
+                        args.mode = "recycle";
+
+                        var selectedRows = gridview.getSelectedRows();
+                        if (!selectedRows.length || $.inArray(args.row, selectedRows) == -1) {
+                            selectedRows = [args.row];
+                            gridview.setSelectedRows(selectedRows);
+                        }
+
+                        args.rows = selectedRows;
+                        args.count = selectedRows.length;
+
+                        var proxy = $("<span></span>")
+                                .css({
+                                    position: "absolute",
+                                    display: "inline-block",
+                                    padding: "4px 10px",
+                                    background: "#e0e0e0",
+                                    border: "1px solid gray",
+                                    "z-index": 99999,
+                                    "-moz-border-radius": "8px",
+                                    "-moz-box-shadow": "2px 2px 6px silver"
+                                })
+                                .text("Drag to Recycle Bin to delete " + args.count + " selected row(s)")
+                                .appendTo("body");
+
+                        args.helper = proxy;
+                        $(args.available).css("background", "pink");
+
+                        return proxy;
+                    };
+
+                    events.onDrag = function(e, args) {
+                        if (args.mode != "recycle") return;
+                        args.helper.css({top: e.pageY + 5, left: e.pageX + 5});
+                    };
+
+                    events.onDragEnd = function(e, args) {
+                        if (args.mode != "recycle") return;
+                        args.helper.remove();
+                        $(args.available).css("background", "beige");
+                    };
+
+                    events.onAddNewRow = function(e, args, row) {
+                        var item = { name: "New task", complete: false };
+                        $.extend(item, args.item);
+                        data.push(item);
+                        grid.render(data);
+                    };
+
+                    return events;
                 })
                 .render(data);                      // Add data to grid and render
+
+            $.drop({mode: "mouse"});
+            $("#dropzone")
+                .bind("dropstart", function (e, dd) {
+                    if (dd.mode != "recycle") {
+                        return;
+                    }
+                    $(this).css("background", "yellow");
+                })
+                .bind("dropend", function (e, dd) {
+                    if (dd.mode != "recycle") {
+                        return;
+                    }
+                    $(dd.available).css("background", "pink");
+                })
+                .bind("drop", function (e, dd) {
+                    var gridview = grid.gridview();
+                    if (dd.mode != "recycle") {
+                        return;
+                    }
+                    var rowsToDelete = dd.rows.sort().reverse();
+                    for (var i = 0; i < rowsToDelete.length; i++) {
+                        data.splice(rowsToDelete[i], 1);
+                    }
+                    grid.render(data);
+                    gridview.setSelectedRows([]);
+                });
 
             // When this tab is shown to the user,
             // run resize for page elements
@@ -198,15 +384,20 @@
             return page;
         };
 
+        page.resize = function() {
+            resizePageElements();
+            return page;
+        };
+
         // ----- Private functions -----
         // Create some dummy data
         function generateDummyData() {
             var data = [
-	            { id: 0, name: "Make a list", complete: true },
-	    		{ id: 1, name: "Check it twice", complete: false },
-	    		{ id: 2, name: "Find out who's naughty", complete: false },
-	    		{ id: 3, name: "Find out who's nice", complete: false }
-    		];
+                { name: "Make a list", complete: true },
+                { name: "Check it twice", complete: false },
+                { name: "Find out who's naughty", complete: false },
+                { name: "Find out who's nice", complete: false }
+            ];
 
             return data;
         }
