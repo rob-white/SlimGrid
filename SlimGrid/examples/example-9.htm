@@ -273,6 +273,7 @@
                     gridview.registerPlugin(moveRowsPlugin);
                 })
                 .events(function (events) {
+
                     events.onDragInit  = function(e, args) {
                         e.stopImmediatePropagation();
                     };
@@ -332,6 +333,7 @@
                     };
 
                     events.onAddNewRow = function(e, args, row) {
+                        var data = this.getData();
                         var item = { name: "New task", complete: false };
                         $.extend(item, args.item);
                         data.push(item);

@@ -1047,7 +1047,7 @@ function SlimGrid() {
                             row[col['id']] = item.hasOwnProperty(col['id']) ? item[col['id']] : null;
                         });
 
-                        events.onAddNewRow.call(this, e, args, [row]);
+                        events.onAddNewRow.call(grid, e, args, [row]);
                     });
 
                     // Event is fired when the grid's row count changes
