@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <title>SlimGrid - Example 10</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap themed site -->
+    <link href="../css/bootstrap/bootstrap.min.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/bootstrap/bootstrap-responsive.min.css?v=1.0" rel="stylesheet" type="text/css"/>
+
+    <!-- CSS required for SlickGrid/SlimGrid -->
+    <link href="../css/slickgrid/slick.grid.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/jquery/smoothness/jquery-ui-1.10.3.custom.min.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.pager.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.columnpicker.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.headerbuttons.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.headermenu.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick-default-theme.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/plugins-common.css?v=1.0" rel="stylesheet" type="text/css"/>
+
+    <style type="text/css">
+        /* Push tabs down so they aren't flush with the top */
+        #tab-container {
+            margin-top: 80px;
+        }
+
+        .special-cell {
+            height: 100%;
+            display: block;
+            padding: 0px;
+            font-weight: bold;
+            vertical-align: baseline;
+            white-space: nowrap;
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+
+        .query-settings {
+            margin-bottom: 10px;
+        }
+    </style>
+</head><!--/head -->
+
+<html ng-app="example" lang="en-us">
+<body resizeable>
+<div id="tab-container" class="container-fluid">
+    <ul class="nav nav-tabs" id="tabs">
+        <li class="active" id="example-10-tab">
+            <a href="#example-10" data-toggle="tab">Example 10</a>
+        </li>
+    </ul><!--/#tabs -->
+    <div class="tab-content">
+        <div ng-controller="exampleController" class="tab-pane active" id="example-10">
+            <form class="query-settings row-fluid">
+                <button ng-click="queryData()" ng-disabled="isQuerying" class="btn">{{ isQuerying ? 'Loading...' : 'Query' }}</button>
+                <button ng-click="setRandomHeight()" class="btn">Random Height</button>
+            </form>
+            <div class="row-fluid">
+                <slimgrid data="data" height="height" width="windowWidth" id="example-10-table" class="span7"></slimgrid>
+                <div class="span5">
+                    <h3 class="text-center">Overview</h3>
+                    <hr/>
+                    <ul>
+                        <li>Shows how to implement a simple SlimGrid in Angular.js</li>
+                        <li><b>Note:</b> This obviously isn't a pure Angular.js implementation and can be greatly improved upon in the future.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--/#example-10 -->
+    </div>
+    <!--/.tab-content -->
+</div>
+<!--/.tab-content -->
+
+<!-- jQuery scripts -->
+<script src="../js/jquery/jquery-1.9.1.js?v=1.0" type="text/javascript"></script>
+<script src="../js/angular/angular.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery-ui-1.10.3.custom.min.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery.event.drop-2.2.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery.event.drag-2.2.js?v=1.0" type="text/javascript"></script>
+
+<!-- Bootstrap scripts -->
+<script src="../js/bootstrap/bootstrap.min.js?v=1.0" type="text/javascript"></script>
+
+<!-- Slickgrid scripts -->
+<script src="../js/slickgrid/slick.core.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.grid.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.formatters.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.dataview.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.pager.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.groupitemmetadataprovider.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellrangedecorator.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellrangeselector.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellselectionmodel.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.rowselectionmodel.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.rowmovemanager.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.columnpicker.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slickgrid.headerfilter.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellexternalcopymanager.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.editors.js?v=1.0" type="text/javascript"></script>
+
+<!-- SlimGrid dependency (will be removed in future update)-->
+<script src="../js/underscore/underscore.js?v=1.0" type="text/javascript"></script>
+
+<!-- SlimGrid wrapper for SlickGrid creation -->
+<script src="../slim.grid.js?v=1.0" type="text/javascript"></script>
+
+<script type="text/javascript">
+angular.module('example', [])
+    .factory('dataFactory', function () {
+        // Only used to create data for the example
+        // You'd likely use a $http request here
+        function createDummyData(){
+            var mockData = [];
+            for(var i = 0; i < 1000; i++) {
+                mockData.push({
+                    unneeded_column: null,
+                    player: 'Player ' + i,
+                    gender: i % 3 == 0 ? 'Male' : 'Female',
+                    score: Math.round(Math.random() * (1 - 99) + 99)
+                });
+            }
+
+            return mockData;
+        }
+
+        return {
+            getData: function (complete) {
+                complete();
+                return createDummyData();
+            }
+        };
+    })
+    .controller('exampleController', function ($scope, dataFactory) {
+
+        $scope.data = [];
+        $scope.height = 400;
+
+        $scope.isQuerying = false;
+        $scope.setRandomHeight = function(){
+            $scope.height = Math.round(Math.random() * (100 - 400) + 400);
+        };
+        $scope.queryData = function () {
+            $scope.isQuerying = true;
+            $scope.data = dataFactory.getData(function(){
+                $scope.isQuerying = false;
+            });
+        };
+
+        $scope.queryData();
+    })
+    .directive('slimgrid', function ($window) {
+        var grid = SlimGrid();
+        return {
+            restrict: 'E',
+            replace: true,
+            template: '<div></div>',
+            scope: {
+                height: '=height',
+                data: '=data',
+                width: '=width'
+            },
+            link: function (scope, element, attrs) {
+
+                grid.container(element[0])
+                    .selectionModel(new Slick.CellSelectionModel)
+                    .gridOptions({
+                        // SlickGrid
+                        defaultColumnWidth: 90,
+                        forceFitColumns: false,
+                        multiSelect: true,
+
+                        // SlimGrid
+                        height: scope.height,
+                        copyOut: true,
+                        autoIncrement: true, // Since the data set we're pulling doesn't have a unique key, auto generate one
+                        downloadable: true,
+                        showColumnPicker: true,
+                        showHeaderFilter: true
+                    })
+                    .columnOptions(function (key, column) {
+
+                        column['formatter'] = function (row, cell, value, columnDef, dataContext) {
+                            // Format cells based on key and/or value
+                            if (columnDef['id'] == 'gender' && value == 'Female') {
+                                return "<span class=\"special-cell\" style='background-color: rgb(39, 41, 214); color: #FFF'>" + value + "</span>";
+                            }
+
+                            if (columnDef['id'] == 'gender' && value == 'Male') {
+                                return "<span class=\"special-cell\" style='background-color: rgb(214, 10, 16); color: #FFF'>" + value + "</span>";
+                            }
+
+                            if (columnDef['id'] == 'score') {
+                                return "<span>" + value + " pts</span>";
+                            }
+
+                            return value;
+                        };
+
+                        // Add column options based on column key
+                        if (key == 'unneeded_column') column['hidden'] = true;  // Hide the "uneeded_column"
+                        if (key == 'score') column['width'] = 400;              // Set width of population column to 400px
+
+                        return column;
+                    })
+                    .events(function(events){
+
+                        // If there was an error rendering the grid...
+                        // do something here
+                        events.onRenderError = function (error){
+                            if(error) alert('AHHHHHHH, an error!');
+                        };
+
+                        return events;
+                    });
+
+                scope.$watch('data', function (newVal, oldVal) {
+                    // If we have data, load the grid with it
+                    if (newVal.length > 0) grid.render(newVal);
+                });
+
+                scope.$watch('height', function (newVal, oldVal) {
+                    grid.gridOptions({ height: newVal });
+                    if (scope.data.length > 0) grid.render(scope.data);
+                });
+
+                scope.$watch('width', function (newVal, oldVal) {
+                    grid.resize();
+                });
+            }
+        }
+    })
+    .directive('resizeable', function ($window) {
+        return function (scope, element) {
+            var w = angular.element($window);
+
+            scope.windowHeight = w.height();
+            scope.windowWidth = w.width();
+
+            w.bind('resize', function () {
+                scope.windowHeight = w.height();
+                scope.windowWidth = w.width();
+                scope.$apply();
+            });
+        }
+    });
+</script>
+</body><!--/body -->
+</html><!--/html -->

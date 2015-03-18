@@ -1316,6 +1316,9 @@ function SlimGrid() {
 
             dataview.setGrouping(grouping);
 
+            // Set the height of the grid container
+            myGrid.css('height', slimgridOptions.height + 'px');
+
 			// Perform a resize
             gridview.invalidate();
             gridview.resizeCanvas();
