@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <title>SlimGrid - Example 11</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap themed site -->
+    <link href="../css/bootstrap/bootstrap.min.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/bootstrap/bootstrap-responsive.min.css?v=1.0" rel="stylesheet" type="text/css"/>
+
+    <!-- CSS required for SlickGrid/SlimGrid -->
+    <link href="../css/slickgrid/slick.grid.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/jquery/smoothness/jquery-ui-1.10.3.custom.min.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.pager.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.columnpicker.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.headerbuttons.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.headermenu.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick-default-theme.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/plugins-common.css?v=1.0" rel="stylesheet" type="text/css"/>
+
+    <style type="text/css">
+        /* Push tabs down so they aren't flush with the top */
+        #tab-container {
+            margin-top: 80px;
+        }
+    </style>
+</head><!--/head -->
+
+<html lang="en-us">
+<body>
+<div id="tab-container" class="container-fluid">
+    <ul class="nav nav-tabs" id="tabs">
+        <li id="example-11-tab">
+            <a href="#example-11" data-toggle="tab">Example 11</a>
+        </li>
+    </ul>
+    <!--/#tabs -->
+    <div class="tab-content">
+        <div class="tab-pane" id="example-11">
+            <div class="row-fluid">
+                <div id="example-11-table" class="span7"></div>
+                <div class="span5">
+                    <h3 class="text-center">Overview</h3>
+                    <hr/>
+                    <a href="https://github.com/rob-white/SlimGrid/blob/master/SlimGrid/examples/example-111.htm">Source Code on Github</a>
+                    <hr/>
+                    <ul>
+                        <li>Demonstrates editable grid with copy/paste ability using ctrl-c/ctrl-v</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--/#example-11 -->
+    </div>
+    <!--/.tab-content -->
+</div>
+<!--/.tab-content -->
+
+<!-- jQuery scripts -->
+<script src="../js/jquery/jquery-1.9.1.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery-ui-1.10.3.custom.min.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery.event.drop-2.2.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery.event.drag-2.2.js?v=1.0" type="text/javascript"></script>
+
+<!-- Bootstrap scripts -->
+<script src="../js/bootstrap/bootstrap.min.js?v=1.0" type="text/javascript"></script>
+
+<!-- Slickgrid scripts -->
+<script src="../js/slickgrid/slick.core.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.grid.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.formatters.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.dataview.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.pager.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.groupitemmetadataprovider.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellrangedecorator.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellrangeselector.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellselectionmodel.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.rowselectionmodel.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.columnpicker.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slickgrid.headerfilter.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellexternalcopymanager.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.editors.js?v=1.0" type="text/javascript"></script>
+
+<!-- SlimGrid dependency (will be removed in future update)-->
+<script src="../js/underscore/underscore.js?v=1.0" type="text/javascript"></script>
+
+<!-- SlimGrid wrapper for SlickGrid creation -->
+<script src="../slim.grid.js?v=1.0" type="text/javascript"></script>
+
+<script type="text/javascript">
+    // Example 11
+    $(document).ready(function () {
+        // When jQuery's ready, initialize the example and show the tab
+        var example = Example().init().show();
+
+        $(window).on('resize', function(){
+            example.resize();
+        });
+    });
+
+    function Example() {
+        // Reference elements with jQuery
+        var $el = {
+            tab: $('#example-11-tab a'),
+            gridContainer: $('#example-11-table')
+        },
+        gridHeight = 400,	// Set the height we want to use
+        grid = SlimGrid();	// Create a base SlimGrid
+
+        // Constructor
+        function page() { }
+
+        // ----- Public functions -----
+        page.init = function () {
+            // Create example data
+            var data = generateDummyData();
+
+            // Create a SlimGrid (SlickGrid) with options and formatting
+            grid.container($el.gridContainer)	        // The container element of the grid (a jQuery element)
+                    .selectionModel(new Slick.CellSelectionModel)
+                    .gridOptions({
+                        // -- SlickGrid --
+                        editable: true,
+                        autoEdit: false,
+                        enableAddRow: true,
+                        enableCellNavigation: true,
+                        asyncEditorLoading: false,
+                        defaultColumnWidth: 30,
+                        forceFitColumns: false,
+                        multiSelect: true,
+
+                        // -- SlimGrid --
+                        height: gridHeight,             // The height of the grid
+                        autoIncrement: true,            // If we don't have a unique key, SlimGrid can auto-generate one
+                        copyOut: true,                  // Allow user to copy out data with ctrl-c
+                        downloadable: true,             // Download data (csv) link provided at bottom of grid
+                        showColumnPicker: false,        // Don't use column filter plugin on right-click of column headers
+                        showHeaderFilter: false         // Filter plugin added to column headers
+                    })
+                    .columnOptions(function(key, column){
+                        if(key == 'id') {
+                            column['hidden'] = false;
+                            column['name'] = '';
+                        }
+                        else {
+                            column['editor'] = Slick.Editors.Text;
+                        }
+
+                        return column;
+                    })
+                    .events(function(events){
+
+                        events.onAddNewRow = function(e, args, row){
+                            var data = this.getData();
+                            var item = args.item;
+
+                            data.push(item);
+                            grid.render(data);
+                        };
+
+                        events.onPasteCells = function(e, args){
+
+                        };
+
+                        return events;
+                    })
+                    .render(data);                      // Add data to grid and render
+
+            // When this tab is shown to the user,
+            // run resize for page elements
+            $el.tab.on('shown', function (e) {
+                resizePageElements();
+            });
+
+            return page;
+        };
+
+        // Show the tab if it's not currently selected
+        page.show = function () {
+            $el.tab.tab('show');
+            return page;
+        };
+
+        page.resize = function () {
+            resizePageElements();
+            return page;
+        };
+
+        // ----- Private functions -----
+        // Create some dummy data
+        function generateDummyData() {
+            var data = [];
+            for (var i = 0; i < 1000; i++) {
+                var row = { };
+                for (var j = 0; j < 100; j++) {
+                    var columnName = String.fromCharCode("A".charCodeAt(0) + (j / 26) | 0) +
+                    String.fromCharCode("A".charCodeAt(0) + (j % 26));
+                    row[columnName] = null;
+                }
+                data.push(row);
+            }
+
+            return data;
+        }
+
+        function resizePageElements() {
+            // Calls SlickGrid resize
+            grid.resize();
+        }
+
+        return page;
+    }
+
+</script>
+</body><!--/body -->
+</html><!--/html -->

@@ -563,7 +563,10 @@ function SlimGrid() {
 
                     // Hide primary key column by default
                     // Setting column['hidden'] = false will override this
-                    if (key == slimgridOptions.pk) column['hidden'] = true;
+                    if (key == slimgridOptions.pk){
+                        column['hidden'] = true;
+                        column['order'] = -1;
+                    }
 
                     // Override column options with user preferences
                     column = columnOptions.call(grid, key, column);
@@ -1263,7 +1266,10 @@ function SlimGrid() {
 
                 // Hide primary key column by default
                 // Setting column['hidden'] = false will override this
-                if (key == slimgridOptions.pk) column['hidden'] = true;
+                if (key == slimgridOptions.pk){
+                    column['hidden'] = true;
+                    column['order'] = -1;
+                }
 
                 // Override/merge default column options with custom preferences
                 column = columnOptions.call(grid, key, column);
