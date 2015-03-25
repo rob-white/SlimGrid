@@ -922,7 +922,8 @@ function SlimGrid() {
                                             dt = gridview.getDataItem(i);
 
                                         for (var j = range.fromCell; j < range.toCell + 1; j++) {
-                                            selectedCells.push(getDataItemValueForColumn(dt, columns[j]));
+                                            var val = dt[columns[j].field]
+                                            selectedCells.push(val);
                                         }
 
                                         selectedRows.push(selectedCells);
@@ -936,29 +937,6 @@ function SlimGrid() {
                                 calculateStatistics(selectedArr);
                             }
                         });
-
-                        function getDataItemValueForColumn(item, columnDef) {
-                            var val = '';
-
-                            // If a custom getter is not defined, we call serializeValue of the editor to serialize
-                            if (columnDef.editor) {
-                                var editorArgs = {
-                                    'container': $("body"),  // a dummy container
-                                    'column': columnDef,
-                                    'position': { 'top': 0, 'left': 0 }  // a dummy position required by some editors
-                                };
-                                var editor = new columnDef.editor(editorArgs);
-
-                                editor.loadValue(item);
-                                val = editor.serializeValue();
-                                editor.destroy();
-                            }
-                            else {
-                                val = item[columnDef.field];
-                            }
-
-                            return val;
-                        }
 
                         function calculateStatistics(selectionArray) {
                             // Flatten the selected range (2d array)
