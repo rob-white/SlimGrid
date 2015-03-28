@@ -196,9 +196,16 @@
 
             var offset = $(this).offset();
             var left = offset.left - $menu.width() + $(this).width() - 8;
+            var top = offset.top + $(this).height();
+            var bottom = offset.top + $(this).height() + $menu[0].offsetHeight;
+            var windowHeight = $(window).height();
 
-            $menu.css("top", offset.top + $(this).height())
-                 .css("left", (left > 0 ? left : 0));
+            if (bottom >= windowHeight) {
+                $filter.css('height', $filter.height() - (bottom - windowHeight) - 1);
+            }
+
+            $menu.css("top", top)
+             .css("left", (left > 0 ? left : 0));
         }
 
         function columnsResized() {
