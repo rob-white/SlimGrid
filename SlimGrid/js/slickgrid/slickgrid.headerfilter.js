@@ -59,6 +59,8 @@
             if (args.column.id != '_checkbox_selector') {
                 var column = args.column;
 
+                if(!column.headerFilter) { return false; }
+
                 var $el = $("<div></div>")
                     .addClass("slick-header-menubutton")
                     .data("column", column);

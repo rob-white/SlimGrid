@@ -554,6 +554,7 @@ function SlimGrid() {
                         'name': key,
                         'field': key,
                         'order': colOrder,
+                        'headerFilter': true,
                         'sortable': false,
                         'formatter': function (row, cell, value, columnDef, dataContext) {
                             return value;
@@ -1235,6 +1236,7 @@ function SlimGrid() {
                     'name': key,
                     'field': key,
                     'order': colOrder,
+                    'headerFilter': true,
                     'sortable': true,
                     'formatter': function (row, cell, value, columnDef, dataContext) {
                         return value;
