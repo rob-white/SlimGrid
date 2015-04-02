@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <title>SlimGrid Example 13</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap themed site -->
+    <link href="../css/bootstrap/bootstrap.min.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/bootstrap/bootstrap-responsive.min.css?v=1.0" rel="stylesheet" type="text/css"/>
+
+    <!-- CSS required for Slickgrid -->
+    <link href="../css/slickgrid/slick.grid.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/jquery/smoothness/jquery-ui-1.10.3.custom.min.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.pager.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.columnpicker.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.headerbuttons.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick.headermenu.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/slick-default-theme.css?v=1.0" rel="stylesheet" type="text/css"/>
+    <link href="../css/slickgrid/plugins-common.css?v=1.0" rel="stylesheet" type="text/css"/>
+
+    <style type="text/css">
+
+        #tab-container {
+            margin-top: 80px;
+        }
+
+        .query-settings {
+            margin-bottom: 10px;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+        .line {
+            fill: none;
+            stroke: steelblue;
+            stroke-width: 1.5px;
+        }
+        .grid .tick {
+            stroke: #ededed;
+            opacity: 0.7;
+        }
+        .axis {
+            -webkit-user-select: none;  /* Chrome/Safari */
+            -moz-user-select: none;     /* Firefox */
+            -ms-user-select: none;      /* IE10+ */
+        }
+    </style>
+</head><!--/head -->
+
+<html lang="en-us">
+<body>
+<div id="tab-container" class="container-fluid">
+    <ul class="nav nav-tabs" id="tabs">
+        <li id="example-13-tab">
+            <a href="#example-13" data-toggle="tab">Example 13</a>
+        </li>
+    </ul>
+    <!--/#tabs -->
+    <div class="tab-content">
+        <div class="tab-pane" id="example-13">
+            <form class="query-settings form-inline">
+                <button id="example-13-query-btn" type="submit" class="btn">Refresh Data</button>
+            </form>
+            <div class="row-fluid">
+                <div class="span7">
+                    <div class="row-fluid">
+                        <div id="example-13-chart" class="span10"></div>
+                        <div id="example-13-legend" class="span2"></div>
+                    </div>
+                    <div id="example-13-table" class="row-fluid"></div>
+                </div>
+                <div class="span5">
+                    <h3 class="text-center">Overview</h3>
+                    <hr/>
+                    <a href="https://github.com/rob-white/SlimGrid/blob/master/SlimGrid/examples/example-13.htm">Source Code on Github</a>
+                    <hr/>
+                    <ul>
+                        <li>Filter the grid to dynamically update the d3 chart</li>
+                    </ul>
+                </div>
+            </div>
+        </div><!--/#example-13 -->
+    </div><!--/.tab-content -->
+</div><!--/.tab-content -->
+
+<!-- jQuery scripts -->
+<script src="../js/jquery/jquery-1.9.1.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery-ui-1.10.3.custom.min.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery.event.drop-2.2.js?v=1.0" type="text/javascript"></script>
+<script src="../js/jquery/jquery.event.drag-2.2.js?v=1.0" type="text/javascript"></script>
+
+<!-- Only used for creating a fake jQuery ajax request -->
+<script src="js/ajax.fake.js" type="text/javascript"></script>
+<script src="js/webservices.fake.js" type="text/javascript"></script>
+<!-- Bootstrap scripts -->
+<script src="../js/bootstrap/bootstrap.min.js?v=1.0" type="text/javascript"></script>
+
+<!-- Slickgrid scripts -->
+<script src="../js/slickgrid/slick.core.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.grid.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.formatters.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.dataview.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.pager.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.groupitemmetadataprovider.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellrangedecorator.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellrangeselector.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellselectionmodel.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.rowselectionmodel.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.columnpicker.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slickgrid.headerfilter.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.cellexternalcopymanager.js?v=1.0" type="text/javascript"></script>
+<script src="../js/slickgrid/slick.editors.js?v=1.0" type="text/javascript"></script>
+
+<!-- SlimGrid dependency (will be removed in future update)-->
+<script src="../js/underscore/underscore.js?v=1.0" type="text/javascript"></script>
+<!-- D3.js Charting Library-->
+<script src="https://rawgit.com/rob-white/d3-reusable-charts/master/d3-reusable-charts/js/d3/d3.js" type="text/javascript"></script>
+<!-- Reusable Scatter Chart -->
+<script src="https://rawgit.com/rob-white/d3-reusable-charts/master/d3-reusable-charts/reusable.scatterchart.js" type="text/javascript"></script>
+
+<!-- SlimGrid wrapper for SlickGrid creation -->
+<script src="../slim.grid.js?v=1.0" type="text/javascript"></script>
+
+<script type="text/javascript">
+    // Example 13
+    $(document).ready(function () {
+        // When jQuery's ready, initialize the example and show the tab
+        var example = Example().init().show();
+
+        $(window).on('resize', function(){
+            example.resize();
+        });
+    });
+
+    function Example() {
+
+        var $el = {
+            tab: $('#example-13-tab a'),
+            queryBtn: $('#example-13-query-btn'),
+            chartContainer: $('#example-13-chart'),
+            gridContainer: $('#example-13-table')
+        },
+        grid = SlimGrid(),
+        chart,
+        DATE_FORMAT = d3.time.format("%m/%d/%Y %H:%M:%S"),
+        CHART_HEIGHT = 200,
+        GRID_HEIGHT = 250;
+
+        // Constructor
+        function page() { }
+
+        // ----- Public -----
+        page.init = function () {
+            enablePageLoading();
+
+            // Create a SlimGrid with options and formatting
+            grid.container($el.gridContainer)
+                .selectionModel(new Slick.CellSelectionModel)
+                .gridOptions({
+                    // SlickGrid
+                    defaultColumnWidth: 90,
+                    forceFitColumns: false,
+                    multiSelect: true,
+
+                    // SlimGrid
+                    height: GRID_HEIGHT,
+                    copyOut: true,
+                    autoIncrement: true, // Since the data set we're pulling doesn't have a unique key, auto generate one
+                    downloadable: true,
+                    showColumnPicker: true,
+                    showHeaderFilter: true,
+                    ajaxOptions: {
+                        url: "http://example.url.com/example13.json",
+                        type: "GET",
+                        fake: true,
+                        async: true,
+                        datatype: "jsonp"
+                    }
+                })
+                .events(function(events){
+
+                    // Called after the grid is rendered on screen
+                    events.afterRender = function (data){
+                        disablePageLoading();
+                    };
+
+                    events.onDataviewUpdate = function(){
+                        var data = this.getFilteredData();
+                        renderChart(data);
+                    };
+
+                    return events;
+                })
+                .render();
+
+            // Allow buttons to respond to on-click event
+            $el.queryBtn.on('click', function (e) {
+                e.preventDefault();
+                queryData();
+            });
+
+            // When this tab is shown to the user,
+            // run resize for page elements
+            $el.tab.on('shown', function (e) {
+                resizePageElements();
+            });
+
+            return page;
+        };
+
+        // Show the tab if it's not currently selected
+        page.show = function () {
+            $el.tab.tab('show');
+            return page;
+        };
+
+        page.resize = function () {
+            resizePageElements();
+            return page;
+        };
+
+        // ----- Private functions -----
+        // Set the page to "loading" state (user can't click on anything)
+        function enablePageLoading() {
+            $el.queryBtn.prop('disabled', true).text('Loading...').blur();
+        }
+
+        // Remove "loading" state from the page (user now allowed to interact with stuff)
+        function disablePageLoading() {
+            $el.queryBtn.prop('disabled', false).text('Refresh Data');
+        }
+
+        function queryData() {
+            // Render the grid. If it already exists,
+            // just update the data/columns in the grid.
+            enablePageLoading();
+            grid.render();
+        }
+
+        // Code to render the chart
+        function renderChart(data){
+            chart = ScatterChart()
+                .rootNode(d3.select('#tab-container')) // For tooltip
+                    .width($el.chartContainer.width())
+                    .height(CHART_HEIGHT)
+                    .margin({ top: 10, right: 5, bottom: 40, left: 30 })
+                    .dataId(function(d){
+                        // Column that makes a row unique
+                        return d['id'];
+                    })
+                    .x(function (d) {
+                        // X axis value column
+                        return DATE_FORMAT.parse(d['date']);
+                    })
+                    .y(function (d) {
+                        // Y axis value column
+                        return d['score'];
+                    })
+                    .xTickFormat(function (d) {
+                        var format = d3.time.format('%m/%d');
+                        return format(d);
+                    })
+                    .color(d3.scale.category10())
+                    .transition(false)
+                    .yAxisLabel('Score')
+                    .xAxisLabel('Date')
+                    .showLegend(true)
+                    .showGrid(true)
+                    .legendContainer('#example-13-legend')
+                    .groupBy(function (d) {
+                        // Colors data/creates legend by this column
+                        return d['gender'];
+                    });
+
+            d3.select('#' + $el.chartContainer.attr('id'))
+                .datum(data)
+                .call(chart);
+
+            resizePageElements();
+        }
+
+        function resizePageElements() {
+            if(chart){
+                d3.select('#' + $el.chartContainer.attr('id'))
+                    .call(chart
+                            .width($el.chartContainer.width())
+                            .height(CHART_HEIGHT)
+                            .x(function (d) {
+                                return DATE_FORMAT.parse(d['date']);
+                            })
+                            .y(function (d) {
+                                return d['score'];
+                            }));
+            }
+
+            grid.resize();
+        }
+
+        return page;
+    }
+
+</script>
+</body><!--/body -->
+</html><!--/html -->

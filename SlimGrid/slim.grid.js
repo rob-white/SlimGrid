@@ -169,7 +169,7 @@ function SlimGrid() {
             },
             onSelectedRangesChanged: function (e, args) {
             },
-            onDataviewUpdate: function (e, args) {
+            onDataviewUpdate: function () {
             },
             onPasteCells: function (e, args) {
             },
@@ -1034,7 +1034,6 @@ function SlimGrid() {
 
                     // Event is fired when the grid's row count changes
                     dataview.onRowCountChanged.subscribe(function (e, args) {
-                        if (exists) events.onDataviewUpdate.call(grid, e, args);
                         gridview.updateRowCount();
                         gridview.render();
                     });
@@ -1083,6 +1082,7 @@ function SlimGrid() {
                             columnFilters[columnId] = $.trim($(this).val());
                             delay(function () {
                                 dataview.refresh();
+                                events.onDataviewUpdate.call(grid);
                             }, 300);
                         }
                     });
@@ -1167,6 +1167,7 @@ function SlimGrid() {
                             dataview.refresh();
                             gridview.invalidate();
                             gridview.resetActiveCell();
+                            events.onDataviewUpdate.call(grid);
                         });
 
                         // Event fired when a menu option is selected
@@ -1180,6 +1181,8 @@ function SlimGrid() {
 
                     // Initialize the SlickGrid
                     gridview.init();
+
+                    events.onDataviewUpdate.call(grid);
 
                     // If we want the grid to be excel downloadable
                     var pager = $(myPager).find('.slick-pager');
@@ -1276,6 +1279,8 @@ function SlimGrid() {
             dataview.beginUpdate();
             dataview.setItems(data, slimgridOptions.pk);
             dataview.endUpdate();
+
+            events.onDataviewUpdate.call(grid);
 
             // Allow formatting of rows (color, etc.)
             // using SlickGrid's metadata access
