@@ -959,7 +959,8 @@ function SlimGrid() {
                             }
 
                             var avg = filtered.length > 0 ? Math.round((sum / (filtered.length))*100)/100 : 0;
-                            var count = flattened.length; // Include non-numeric values in count
+                            // Include non-numeric values in count
+                            var count = selectionModel.constructor.name == 'RowSelectionModel' ? gridview.getSelectedRows().length : flattened.length;
                             var min = filtered.length > 0 ? Math.min.apply(null, filtered) : 0;
                             var max = filtered.length > 0 ? Math.max.apply(null, filtered) : 0;
 
@@ -1009,7 +1010,7 @@ function SlimGrid() {
                         }, true);
                     }
 
-                    if (typeof selectionModel == 'RowSelectionModel') {
+                    if (selectionModel.constructor.name == 'RowSelectionModel') {
                         // Event is fired when a new row is selected other than
                         // the current selected row
                         gridview.onSelectedRowsChanged.subscribe(function (e, args) {
