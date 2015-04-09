@@ -76,6 +76,7 @@ function SlimGrid() {
         myGrid = $('<div class="slim-grid" style="height: ' + slimgridOptions.height + 'px; border-right: 1px solid #d3d3d3; border-left: 1px solid #d3d3d3; font-size: 11px !important;"></div>'),
         myPager = $('<div class="slim-pager"></div>'),
         selectionModel = new Slick.RowSelectionModel(),
+        checkboxSelector = new Slick.CheckboxSelectColumn(),
         columnFilters = {},
         rowFormatter = function (row) {
             return row;
@@ -540,7 +541,7 @@ function SlimGrid() {
                 // columns and set their options
 
                 if(slimgridOptions.showCheckboxes){
-                    var checkboxSelector = new Slick.CheckboxSelectColumn({
+                    checkboxSelector = new Slick.CheckboxSelectColumn({
                         cssClass: "slick-cell-checkbox"
                     });
                     standardColumns.push(checkboxSelector.getColumnDefinition());
@@ -1232,6 +1233,10 @@ function SlimGrid() {
 
             var standardColumns = [];
 
+            if(slimgridOptions.showCheckboxes){
+                standardColumns.push(checkboxSelector.getColumnDefinition());
+            }
+
             var colOrder = 0;
             for (var key in data[0]) {
                 // Default column options
@@ -1274,7 +1279,7 @@ function SlimGrid() {
             // Set columns into SlickGrid
             gridview.setColumns(standardColumns);
 
-            gridview.onHeaderRowCellRendered.unsubscribe(events.onHeaderRowCellRendered);
+            //gridview.onHeaderRowCellRendered.unsubscribe(events.onHeaderRowCellRendered);
 
             // Set the new data into our dataview
             dataview.beginUpdate();
