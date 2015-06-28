@@ -1305,7 +1305,7 @@ function SlimGrid() {
                     return groupItemMetadataProvider.getTotalsRowMetadata(item);
                 }
                 else {
-                    return rowFormatter(row, dataview);
+                    return rowFormatter(item, dataview);
                 }
 
                 return null;
