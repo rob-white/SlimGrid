@@ -82,6 +82,8 @@
         <div class="tab-pane" id="example-5">
             <form class="query-settings form-inline">
                 <button id="example-5-query-btn" type="submit" class="btn">Refresh Data</button>
+                <button id="example-5-collapse-all-btn" class="btn">Collapse All</button>
+                <button id="example-5-expand-all-btn" class="btn">Expand All</button>
             </form>
             <div class="row-fluid">
                 <div id="example-5-table" class="span7"></div>
@@ -155,6 +157,8 @@
         var $el = {
             tab: $('#example-5-tab a'),
             queryBtn: $('#example-5-query-btn'),
+            collapseAllBtn: $('#example-5-collapse-all-btn'),
+            expandAllBtn: $('#example-5-expand-all-btn'),
             gridContainer: $('#example-5-table')
         },
         gridHeight = 400,
@@ -271,6 +275,18 @@
                 queryData();
             });
 
+            $el.collapseAllBtn.on('click', function (e) {
+                e.preventDefault();
+                $(this).blur();
+                grid.dataview().collapseAllGroups();
+            });
+
+            $el.expandAllBtn.on('click', function (e) {
+                e.preventDefault();
+                $(this).blur();
+                grid.dataview().expandAllGroups();
+            });
+
             // When this tab is shown to the user,
             // run resize for page elements
             $el.tab.on('shown', function (e) {
@@ -295,11 +311,15 @@
         // Set the page to "loading" state (user can't click on anything)
         function enablePageLoading() {
             $el.queryBtn.prop('disabled', true).text('Loading...').blur();
+            $el.collapseAllBtn.prop('disabled', true).blur();
+            $el.expandAllBtn.prop('disabled', true).blur();
         }
 
         // Remove "loading" state from the page (user now allowed to interact with stuff)
         function disablePageLoading() {
             $el.queryBtn.prop('disabled', false).text('Refresh Data');
+            $el.collapseAllBtn.prop('disabled', false);
+            $el.expandAllBtn.prop('disabled', false);
         }
 
         function queryData() {
