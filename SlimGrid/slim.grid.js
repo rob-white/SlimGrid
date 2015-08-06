@@ -78,7 +78,7 @@ function SlimGrid() {
         selectionModel = new Slick.RowSelectionModel(),
         checkboxSelector = new Slick.CheckboxSelectColumn(),
         columnFilters = {},
-        rowFormatter = function (row) {
+        rowFormatter = function (row, dataview) {
             return row;
         },
         columnOptions = function (key, column) {
@@ -1053,7 +1053,7 @@ function SlimGrid() {
                         } else if (item.__groupTotals) {
                             return groupItemMetadataProvider.getTotalsRowMetadata(item);
                         } else {
-                            return rowFormatter(row, dataview);
+                            return rowFormatter(item, dataview);
                         }
 
                         return null;
@@ -1291,7 +1291,7 @@ function SlimGrid() {
                 } else if (item.__groupTotals) {
                     return groupItemMetadataProvider.getTotalsRowMetadata(item);
                 } else {
-                    return rowFormatter(row, item, dataview);
+                    return rowFormatter(item, dataview);
                 }
 
                 return null;
