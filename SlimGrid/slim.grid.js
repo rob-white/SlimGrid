@@ -11,7 +11,7 @@ function SlimGrid() {
 
     // Default SlimGrid grid options
     // Option descriptions can be found in the SlimGrid docs here:
-    // To-do
+    // https://github.com/rob-white/SlimGrid/wiki/SlimGrid-Options
     var slimgridOptions = {
             pk: 'id',
             height: 600,
@@ -20,6 +20,7 @@ function SlimGrid() {
             showColumnpicker: false,
             pasteExactOnly: false,
             showHeaderFilter: true,
+            showHeaderInput: true,
             showPagerStats: true,
             showCheckboxes: false,
             copyOut: false,
@@ -88,13 +89,14 @@ function SlimGrid() {
             return true;
         },
         plugins = function(gridview){
+            return [];
         },
         grouping = [],
         // Available SlimGrid events
         events = {
             onScroll: function (e, args) {
             },
-            onSort: function (e, args) {
+            onSort: function (sortCols, dataview) {
             },
             onHeaderContextMenu: function (e, args) {
             },
@@ -109,6 +111,8 @@ function SlimGrid() {
             onDblClick: function (e, args) {
             },
             onContextMenu: function (e, args, cell, gridview) {
+            },
+            onContextMenuHide: function (e, args) {
             },
             onContextMenuClick: function (e, args, selectedData) {
             },
@@ -133,12 +137,13 @@ function SlimGrid() {
             onHeaderRowCellRendered: function (e, args) {
                 if (args.column.id != '_checkbox_selector') {
                     $(args.node).empty();
-                    $("<input title='" + args.column.id + "' class='text-center' type='text'>")
+                    var hidden = slimgridOptions.showHeaderInput ? '' : 'display: none;';
+                    $("<input title='" + args.column.id + "' style='text-align: center;" + hidden + "' type='text'>")
                         .data("columnId", args.column.id)
                         .val(columnFilters[args.column.id])
                         .appendTo(args.node);
                 } else {
-                    $("<input class='hidden' type='text'>").data("columnId", args.column.id)
+                    $("<input style='display:none;' type='text'>").data("columnId", args.column.id)
                         .val(columnFilters[args.column.id])
                         .appendTo(args.node);
                 }
@@ -181,7 +186,6 @@ function SlimGrid() {
             afterRender: function (data) {
             },
             onRenderError: function (error) {
-                if(window.console) console.log(error);
             }
         },
         downloadId = generateUUID(),
@@ -737,7 +741,16 @@ function SlimGrid() {
                     gridview.getCanvasNode().focus();
 
                     // Allow any additional plugins be applied to the grid here
-                    plugins.call(grid, gridview);
+                    var customPlugins = plugins.call(grid, gridview);
+                    if(customPlugins) {
+                        if (customPlugins.constructor === Array) {
+                            customPlugins.forEach(function (plugin) {
+                                gridview.registerPlugin(plugin);
+                            });
+                        } else {
+                            gridview.registerPlugin(customPlugins);
+                        }
+                    }
 
                     // If we want the user to be able to copy data
                     // out of the grid with ctrl+c/command+c
@@ -774,7 +787,7 @@ function SlimGrid() {
                         if (e.target.className != 'slick-header-menubutton') {
                             if(!columnResized) {
                                 sorterDefault(args.sortCols, dataview);
-                            } else{
+                            } else {
                                 columnResized = false;
                             }
                         }
@@ -1012,7 +1025,10 @@ function SlimGrid() {
                             var selectedIndexes = gridview.getSelectedRows(),
                                 selectedData = getSelectedRows();
 
-                            events.onRowSelected.call(grid, e, args, selectedData);
+                            if(events.hasOwnProperty('onRowSelected')) {
+                                events.onRowSelected.call(grid, e, args, selectedData);
+                            }
+
                             if (selectedIndexes.length > 0) gridview.setActiveCell(selectedIndexes[0], 0);
                         });
                     }
@@ -1025,17 +1041,29 @@ function SlimGrid() {
                             row[col['id']] = item.hasOwnProperty(col['id']) ? item[col['id']] : null;
                         });
 
-                        events.onAddNewRow.call(grid, e, args, [row]);
+                        if(events.hasOwnProperty('onAddNewRow')) {
+                            events.onAddNewRow.call(grid, e, args, [row]);
+                        }
                     });
 
                     // Event is fired when the grid's row count changes
                     dataview.onRowCountChanged.subscribe(function (e, args) {
+
+                        if(events.hasOwnProperty('onRowCountChanged')) {
+                            events.onRowCountChanged.call(grid, e, args);
+                        }
+
                         gridview.updateRowCount();
                         gridview.render();
                     });
 
                     // Event is fired when a row changes
                     dataview.onRowsChanged.subscribe(function (e, args) {
+
+                        if(events.hasOwnProperty('onRowsChanged')) {
+                            events.onRowsChanged.call(grid, e, args);
+                        }
+
                         gridview.invalidateRows(args.rows);
                         gridview.render();
                     });
@@ -1083,12 +1111,16 @@ function SlimGrid() {
 
                     // Event fired when the header row is rendered
                     gridview.onHeaderRowCellRendered.subscribe(function (e, args) {
-                        events.onHeaderRowCellRendered.call(grid, e, args);
+                        if(events.hasOwnProperty('onHeaderRowCellRendered')) {
+                            events.onHeaderRowCellRendered.call(grid, e, args);
+                        }
                     });
 
                     // Event fired right before the header row is destroyed
                     gridview.onBeforeHeaderRowCellDestroy.subscribe(function (e, args) {
-                        events.onBeforeHeaderRowCellDestroy.call(grid, e, args);
+                        if(events.hasOwnProperty('onBeforeHeaderRowCellDestroy')) {
+                            events.onBeforeHeaderRowCellDestroy.call(grid, e, args);
+                        }
                     });
 
                     // Event fire when a cell's value changes by an edit
@@ -1102,7 +1134,9 @@ function SlimGrid() {
                         cell.value = args.item[gridview.getColumns()[args.cell].field];
                         cell.column = gridview.getColumns()[args.cell].field;
 
-                        events.onCellChange.call(grid, e, args, cell);
+                        if(events.hasOwnProperty('onCellChange')) {
+                            events.onCellChange.call(grid, e, args, cell);
+                        }
                     });
 
                     if (contextMenu) {
@@ -1111,7 +1145,9 @@ function SlimGrid() {
                             e.preventDefault();
 
                             var cell = gridview.getCellFromEvent(e);
-                            events.onContextMenu.call(grid, e, args, cell, gridview);
+                            if(events.hasOwnProperty('onContextMenu')) {
+                                events.onContextMenu.call(grid, e, args, cell, gridview);
+                            }
 
                             // If row(s) are selected, show the context menu
                             var selectedIndexes = gridview.getSelectedRows();
@@ -1125,15 +1161,20 @@ function SlimGrid() {
 
                             // Hide the context menu on click
                             // anywhere away from it
-                            $('body').one('click', function () {
+                            $('body').one('click', function (e) {
                                 contextMenu.hide();
+                                if(events.hasOwnProperty('onContextMenuHide')) {
+                                    events.onContextMenuHide.call(grid, e, args);
+                                }
                             });
                         });
 
                         // Event fired when a context menu option is selected
                         contextMenu.click(function (e) {
                             var selectedData = getSelectedRows();
-                            events.onContextMenuClick.call(grid, e, selectedData);
+                            if(events.hasOwnProperty('onContextMenuClick')) {
+                                events.onContextMenuClick.call(grid, e, selectedData);
+                            }
                         });
                     }
 
@@ -1156,7 +1197,9 @@ function SlimGrid() {
 
                         // This event is fired when a filter is selected
                         filterPlugin.onFilterApplied.subscribe(function (e, args) {
-                            events.onHeaderFilterClick.call(grid, e, args);
+                            if(events.hasOwnProperty('onHeaderFilterClick')) {
+                                events.onHeaderFilterClick.call(grid, e, args);
+                            }
 
                             dataview.refresh();
                             gridview.invalidate();
@@ -1166,7 +1209,9 @@ function SlimGrid() {
 
                         // Event fired when a menu option is selected
                         filterPlugin.onCommand.subscribe(function (e, args) {
-                            events.onHeaderMenuOptionClick.call(grid, e, args);
+                            if(events.hasOwnProperty('onHeaderMenuOptionClick')) {
+                                events.onHeaderMenuOptionClick.call(grid, e, args);
+                            }
                             headerSorter([args.column], dataview, args.command === "sort-asc");
                         });
 
@@ -1176,7 +1221,9 @@ function SlimGrid() {
                     // Initialize the SlickGrid
                     gridview.init();
 
-                    events.onDataviewUpdate.call(grid);
+                    if(events.hasOwnProperty('onDataviewUpdate')) {
+                        events.onDataviewUpdate.call(grid);
+                    }
 
                     // If we want the grid to be excel downloadable
                     var pager = $(myPager).find('.slick-pager');
@@ -1196,7 +1243,10 @@ function SlimGrid() {
 
                     // At this point, the grid should be rendered
                     exists = true;
-                    events.afterRender.call(grid, data);
+
+                    if(events.hasOwnProperty('afterRender')) {
+                        events.afterRender.call(grid, data);
+                    }
                 });
             } else {
                 // If we want the grid to be excel downloadable
@@ -1307,7 +1357,10 @@ function SlimGrid() {
             gridview.resizeCanvas();
 
             showLoadingIndicator(false);
-            events.afterRender.call(grid, data);
+
+            if(events.hasOwnProperty('afterRender')) {
+                events.afterRender.call(grid, data);
+            }
         } else {
             showLoadingIndicator(false);
 

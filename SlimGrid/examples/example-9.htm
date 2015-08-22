@@ -192,6 +192,7 @@
                         column['hidden'] = false;
                         column['name'] = '';
                         column['order'] = 0;
+                        column['headerFilter'] = false;
                         column['behavior'] = 'selectAndMove';
                         column['selectable'] = false;
                         column['resizable'] = false;
@@ -219,8 +220,7 @@
                     return column;
                 })
                 .plugins(function (gridview) {
-                    var dataview = this.dataview(),
-                            data = this.getData();
+                    var data = this.getData();
 
                     var moveRowsPlugin = new Slick.RowMoveManager({
                         cancelEditOnDrag: true
@@ -234,6 +234,7 @@
                                 return false;
                             }
                         }
+
                         return true;
                     });
 
@@ -271,7 +272,7 @@
                         gridview.setSelectedRows(selectedRows);
                     });
 
-                    gridview.registerPlugin(moveRowsPlugin);
+                    return moveRowsPlugin;
                 })
                 .events(function (events) {
 
